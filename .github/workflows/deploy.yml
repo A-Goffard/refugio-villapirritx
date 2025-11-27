@@ -22,7 +22,7 @@ jobs:
             # 2. Clonamos o actualizamos
             if [ ! -d ".git" ]; then
               # ¡¡CAMBIA ESTA URL POR LA DE TU NUEVO REPO DEL REFUGIO!!
-              git clone hhttps://github.com/A-Goffard/refugio-villapirritx.git .
+              git clone https://github.com/A-Goffard/refugio-villapirritx.git .
             else
               git pull origin main
             fi
