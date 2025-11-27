@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  app-refugio:
+    build: .
+    container_name: refugio_frontend
+    restart: always
+    ports:
+      - "8082:80"
