@@ -1,0 +1,35 @@
+name: Deploy Refugio to VPS
+
+on:
+  push:
+    branches: [ "main" ] # Asegúrate de que tu rama se llama 'main'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # 1. Creamos una carpeta DIFERENTE para este proyecto
+            mkdir -p ~/refugio-animales
+            cd ~/refugio-animales
+            
+            # 2. Clonamos o actualizamos
+            if [ ! -d ".git" ]; then
+              # ¡¡CAMBIA ESTA URL POR LA DE TU NUEVO REPO DEL REFUGIO!!
+              git clone hhttps://github.com/A-Goffard/refugio-villapirritx.git .
+            else
+              git pull origin main
+            fi
+            
+            # 3. Levantamos los contenedores
+            # Esto usará el puerto 8082 que definiste en docker-compose.yml
+            docker compose up -d --build --remove-orphans
+            
+            # 4. Limpieza para ahorrar espacio
+            docker image prune -f
