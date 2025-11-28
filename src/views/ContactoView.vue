@@ -10,7 +10,7 @@ const route = useRoute()
 
         <div class="capaBlanca">
             <div>
-                <h1>CONTACTA</h1>
+
                 <div class="centre cardLogo">
                     <img class="logo" src="/logos/logo.png" alt="logo Villa Pirritx">
                 </div>
@@ -98,10 +98,12 @@ const route = useRoute()
     display: inline-block; /* Importante para que respete el padding */
     transition: transform 0.2s;
     word-break: break-all; /* Por si el email es muy largo en móvil */
+        font-size: 0.9rem;
 }
 
 .btn-contacto:hover {
     transform: scale(1.05);
+
 }
 
 /* Tarjetas de contacto con fondo blanco para resaltar sobre el rosa */
