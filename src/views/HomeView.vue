@@ -5,13 +5,13 @@ import { RouterLink } from 'vue-router'
 <template>
   <div class="body">
     
-    <div class="capaBlanca">
+    <div class="capaBlanca hero-container">
         <div class="centre cardLogo">
             <img class="logo" src="/logos/logo.png" alt="logo">
-            <h2>VILLA PIRRITIX</h2>
+            <h2>VILLA PIRRITX</h2>
             <p class="textCentre">Ayudando a diferentes animales a encontrar un hogar y poder tener su segunda oportunidad</p>
             
-<div class="botones-hero">
+            <div class="botones-hero">
                 <RouterLink to="/adopcion">
                     <button class="btnRosa">¡Quiero Adoptar!</button>
                 </RouterLink>
@@ -21,12 +21,11 @@ import { RouterLink } from 'vue-router'
             </div>
         </div>
 
-        <div class="centre">
+        <div class="centre imagen-container">
             <img class="imagen" src="/mix/animalitos.png" alt="animalitos">
             <p class="textCentre">TODOS MERECEMOS UNA SEGUNDA OPORTUNIDAD</p>
         </div>
     </div>
-
 
     <div class="capaRosa">
         <div class="centre card2">
@@ -36,7 +35,8 @@ import { RouterLink } from 'vue-router'
                 Rescatamos, rehabilitamos y buscamos finales felices.
             </p>
             <RouterLink to="/proyecto">
-                <button class="btnBlanco">Ver nuestro impacto</button> </RouterLink>
+                <button class="btnBlanco">Ver nuestro impacto</button> 
+            </RouterLink>
         </div>
     </div>
 
@@ -74,41 +74,63 @@ import { RouterLink } from 'vue-router'
 </template>
 
 <style scoped>
-.hero-section {
+/* --- ARREGLO DE LA PORTADA (HERO) --- */
+.hero-container {
     padding-top: 2rem;
+    display: flex;
+    flex-direction: column; /* En móvil, uno debajo del otro */
+    align-items: center;
+    gap: 2rem;
+}
+
+/* En pantallas grandes, ponemos el logo y la foto lado a lado */
+@media (min-width: 900px) {
+    .hero-container {
+        flex-direction: row; /* Lado a lado */
+        justify-content: center;
+        align-items: center;
+        gap: 4rem; /* Espacio entre el texto y la foto */
+        padding: 4rem 2rem;
+    }
 }
 
 .botones-hero {
     display: flex;
     gap: 1rem;
-    margin-top: 1rem;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .cardLogo {
+    width: 100%;
     max-width: 25rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
+    text-align: center;
 }
 
 .logo {
+    width: 80%;
     max-width: 17rem;
 }
 
-.imagen {
-    max-width: 37rem;
-    border-radius: 1rem;
+/* --- AQUÍ ESTABA EL PROBLEMA DE LA IMAGEN --- */
+.imagen-container {
+    width: 100%;
+    max-width: 37rem; /* Contenedor limitado */
+    padding: 0 1rem; /* Un poco de margen en los lados en móvil */
 }
 
-.btnBlanco {
-    background-color: var(--white);
-    color: var(--darkPurple);
-    border: 1px solid var(--darkPurple);
-    padding: 0.5rem 1.5rem;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 1rem;
+.imagen {
+    width: 100%;       /* Ocupa el ancho disponible del padre... */
+    max-width: 37rem;  /* ...pero nunca más de 37rem */
+    height: auto;      /* Mantén la proporción */
+    border-radius: 1rem;
+    display: block;
+    margin: 0 auto;
 }
+
+/* Resto de estilos */
+
 
 .card-link {
     text-decoration: none;
@@ -121,7 +143,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .hover-effect:hover {
-    transform: translateY(-5px); /* Efecto de levantar la tarjeta */
+    transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
