@@ -2,7 +2,7 @@ name: Deploy Refugio to VPS
 
 on:
   push:
-    branches: [ "main" ] # Asegúrate de que tu rama se llama 'main'
+    branches: [ "main" ]
 
 jobs:
   deploy:
@@ -15,21 +15,24 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            # 1. Creamos una carpeta DIFERENTE para este proyecto
-            mkdir -p ~/refugio-animales
+            # 1. Entrar a la carpeta
             cd ~/refugio-animales
             
-            # 2. Clonamos o actualizamos
-            if [ ! -d ".git" ]; then
-              # ¡¡CAMBIA ESTA URL POR LA DE TU NUEVO REPO DEL REFUGIO!!
-              git clone https://github.com/A-Goffard/refugio-villapirritx.git .
-            else
-              git pull origin main
-            fi
+            # 2. Descargar últimos cambios
+            git pull origin main
             
-            # 3. Levantamos los contenedores
-            # Esto usará el puerto 8082 que definiste en docker-compose.yml
+            # 3. Reconstruir y levantar (La opción --build fuerza a instalar librerías nuevas)
             docker compose up -d --build --remove-orphans
             
-            # 4. Limpieza para ahorrar espacio
+            # 4. Esperar unos segundos a que la base de datos arranque (por seguridad)
+            sleep 10
+            
+            # 5. Aplicar cambios en la base de datos (Migraciones) AUTOMÁTICAMENTE
+            # El flag -T es vital para que funcione en modo automático (sin terminal interactiva)
+            docker compose exec -T backend python manage.py migrate --noinput
+            
+            # 6. Recopilar estilos (CSS) para que el panel se vea bonito AUTOMÁTICAMENTE
+            docker compose exec -T backend python manage.py collectstatic --noinput
+            
+            # 7. Limpiar basura vieja para ahorrar espacio
             docker image prune -f

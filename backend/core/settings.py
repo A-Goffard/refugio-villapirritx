@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['villapirritx.org', 'www.villapirritx.org', 'tu-ip-vps', 'local
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -146,3 +147,32 @@ DEBUG = int(os.environ.get('DEBUG', 1))
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost 127.0.0.1").split(" ")
 CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "http://localhost:8082").split(" ")
+
+# --- CONFIGURACIÓN DE JAZZMIN (DISEÑO DEL PANEL) ---
+JAZZMIN_SETTINGS = {
+    # Título de la pestaña del navegador
+    "site_title": "Villa Pirritx Admin",
+    "site_header": "Villa Pirritx",
+    "site_brand": "Administración",
+    "site_logo": None, # Puedes poner ruta relativa si subes el logo a static
+    "login_logo": None,
+    "welcome_sign": "Bienvenido al Panel de Gestión",
+    "copyright": "Asociación Villa Pirritx",
+    "search_model": ["animales.Animal"],
+
+    # Menú lateral
+    "topmenu_links": [
+        {"name": "Ir a la Web", "url": "/", "new_window": True},
+    ],
+    "show_ui_builder": False, # Ponlo en True si quieres jugar con los colores en vivo
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "pulse", # Un tema base limpio
+
+    # COLORES PERSONALIZADOS (Tus morados y rosas)
+    "navbar": "navbar-purple",
+    "sidebar": "sidebar-light-purple",
+    "accent": "accent-purple",
+    "brand_colour": "navbar-purple",
+}
