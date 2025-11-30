@@ -183,13 +183,14 @@ p {
   background: none;
   border: none;
   padding: 0;
+  margin: 0;
 }
 
 /* --- 3. ESTILOS SOLO PARA MÓVIL --- */
 @media (max-width: 900px) {
   .navbar {
     justify-content: flex-end;
-    padding: 0.5rem 1.5rem;
+    padding: 0.5rem 1.0rem;
   }
 
   .navbar-brand {
