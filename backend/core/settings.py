@@ -165,7 +165,7 @@ JAZZMIN_SETTINGS = {
     "topmenu_links": [
         {"name": "Ir a la Web", "url": "/", "new_window": True},
     ],
-    "show_ui_builder": False, # Ponlo en True si quieres jugar con los colores en vivo
+    "show_ui_builder": True, # Ponlo en True si quieres jugar con los colores en vivo
 }
 
 JAZZMIN_UI_TWEAKS = {
