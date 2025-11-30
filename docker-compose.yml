@@ -10,6 +10,7 @@ services:
       volumes:
         - media_volume:/app/media
         - ./backend/db.sqlite3:/app/db.sqlite3
+        - static_volume:/app/staticfiles
       environment:
         - DJANGO_ALLOWED_HOSTS=${PROD_ALLOWED_HOSTS}
         - DJANGO_CSRF_TRUSTED_ORIGINS=${PROD_CSRF_TRUSTED_ORIGINS}
@@ -27,6 +28,7 @@ services:
       - backend
     volumes:
       - media_volume:/app/media # Nginx necesita ver las fotos para servirlas
-
+      - static_volume:/app/staticfiles
 volumes:
   media_volume:
+  static_volume:
