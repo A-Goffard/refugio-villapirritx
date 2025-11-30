@@ -34,3 +34,7 @@ coverage
 
 # Vitest
 __screenshots__/
+
+.env
+backend/db.sqlite3
+backend/media/

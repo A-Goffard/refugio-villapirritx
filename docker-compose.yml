@@ -1,8 +1,32 @@
 version: '3.8'
+
 services:
-  app-refugio:
-    build: .
+  # --- BACKEND (Django) ---
+  backend:
+      build: ./backend
+      container_name: refugio_backend
+      restart: always
+      command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+      volumes:
+        - media_volume:/app/media
+        - ./backend/db.sqlite3:/app/db.sqlite3
+      environment:
+        - DJANGO_ALLOWED_HOSTS=${PROD_ALLOWED_HOSTS}
+        - DJANGO_CSRF_TRUSTED_ORIGINS=${PROD_CSRF_TRUSTED_ORIGINS}
+        - SECRET_KEY=${PROD_SECRET_KEY} # ¡Muy importante para seguridad criptográfica!
+        - DEBUG=0 # En producción siempre 0 (Falso)
+
+  # --- FRONTEND (Vue + Nginx) ---
+  frontend:
+    build: ./frontend
     container_name: refugio_frontend
     restart: always
     ports:
-      - "8082:80"
+      - "8082:80" 
+    depends_on:
+      - backend
+    volumes:
+      - media_volume:/app/media # Nginx necesita ver las fotos para servirlas
+
+volumes:
+  media_volume:
