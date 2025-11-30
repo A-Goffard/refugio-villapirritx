@@ -165,14 +165,38 @@ JAZZMIN_SETTINGS = {
     "topmenu_links": [
         {"name": "Ir a la Web", "url": "/", "new_window": True},
     ],
-    "show_ui_builder": True, # Ponlo en True si quieres jugar con los colores en vivo
+    "show_ui_builder": False, # Ponlo en True si quieres jugar con los colores en vivo
 }
 
 JAZZMIN_UI_TWEAKS = {
-
-    # COLORES PERSONALIZADOS (Tus morados y rosas)
-    "navbar": "navbar-purple",
-    "sidebar": "sidebar-light-purple",
-    "accent": "accent-purple",
-    "brand_colour": "navbar-purple",
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-indigo",
+    "accent": "accent-fuchsia",
+    "navbar": "navbar-indigo navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-light-fuchsia",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    },
+    "actions_sticky_top": False
 }
