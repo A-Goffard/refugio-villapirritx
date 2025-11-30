@@ -122,6 +122,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -155,8 +158,8 @@ JAZZMIN_SETTINGS = {
     "site_title": "Villa Pirritx Admin",
     "site_header": "Villa Pirritx",
     "site_brand": "Administración",
-    "site_logo": None, # Puedes poner ruta relativa si subes el logo a static
-    "login_logo": None,
+    "site_logo": "img/logo.png",# Puedes poner ruta relativa si subes el logo a static
+    "login_logo": "img/logo.png",
     "welcome_sign": "Bienvenido al Panel de Gestión",
     "copyright": "Asociación Villa Pirritx",
     "search_model": ["animales.Animal"],
