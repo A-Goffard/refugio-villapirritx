@@ -168,7 +168,6 @@ JAZZMIN_SETTINGS = {
 }
 
 JAZZMIN_UI_TWEAKS = {
-    "theme": "pulse", # Un tema base limpio
 
     # COLORES PERSONALIZADOS (Tus morados y rosas)
     "navbar": "navbar-purple",
