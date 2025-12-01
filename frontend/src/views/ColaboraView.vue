@@ -29,13 +29,13 @@ import { RouterLink } from 'vue-router'
         </div>
 
         <div class="centre cardLogo">
-            <img class="logo" src="/mix/acogida1.jpeg" alt="casa de acogida">
+            <img class="logo" src="/mix/acogida.png" alt="casa de acogida">
         </div>
     </div>
 
     <div class="capaBlanca">
         <div class="centre cardLogo">
-            <img class="logo" src="/mix/apadrina1.jpeg" alt="apadrina">
+            <img class="logo" src="/mix/niña.png" alt="apadrina">
         </div>
 
         <div class="centre card2">
@@ -59,13 +59,13 @@ import { RouterLink } from 'vue-router'
         </div>
 
         <div class="centre cardLogo">
-            <img class="logo" src="/mix/acogida1.jpeg" alt="donaciones">
+            <img class="logo" src="/mix/dona.png" alt="donaciones">
         </div>
     </div>
 
     <div class="capaBlanca">
         <div class="centre cardLogo">
-            <img class="logo" src="/mix/voluntarios.jpeg" alt="voluntariado">
+            <img class="logo" src="/mix/voluntarios.png" alt="voluntariado">
         </div>
 
         <div class="centre card2">
@@ -89,13 +89,13 @@ import { RouterLink } from 'vue-router'
         </div>
 
         <div class="centre cardLogo">
-            <img class="logo" src="/mix/acogida1.jpeg" alt="viajes">
+            <img class="logo" src="/mix/viaje.png" alt="viajes">
         </div>
     </div>
 
     <div class="capaBlanca">
         <div class="centre cardLogo">
-            <img class="logo" src="/mix/voluntarios.jpeg" alt="difunde">
+            <img class="logo" src="/mix/difunde.png" alt="difunde">
         </div>
 
         <div class="centre card2">
