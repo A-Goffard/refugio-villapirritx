@@ -12,14 +12,14 @@ import 'swiper/css/navigation';
 // Puedes usar las que ya tienes o subir nuevas a /public/mix/
 const imagenesCarrusel = [
     '/animales/2.png',
-    '/animales/3.jpeg',
-    '/animales/4.jpeg',
-    '/animales/5.jpeg',
-    '/animales/6.jpeg',
-    '/animales/7.jpeg',
-    '/animales/8.jpeg',
-    '/animales/9.jpeg',
-    '/animales/10.jpeg',
+    '/animales/3.png',
+    '/animales/4.png',
+    '/animales/5.png',
+    '/animales/6.png',
+    '/animales/7.png',
+    '/animales/8.png',
+    '/animales/9.png',
+    '/animales/10.png',
 ];
 
 // Configuración de los módulos que vamos a usar
