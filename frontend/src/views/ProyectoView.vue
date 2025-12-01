@@ -1,5 +1,29 @@
 <script setup>
-// No necesitamos lógica específica aquí por ahora
+// 1. Importamos los componentes de Swiper y los estilos necesarios
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+
+// Importar estilos de Swiper
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+
+// 2. Definimos las imágenes del carrusel (Pon aquí las rutas de tus fotos reales)
+// Puedes usar las que ya tienes o subir nuevas a /public/mix/
+const imagenesCarrusel = [
+    '/animales/2.png',
+    '/animales/3.jpeg',
+    '/animales/4.jpeg',
+    '/animales/5.jpeg',
+    '/animales/6.jpeg',
+    '/animales/7.jpeg',
+    '/animales/8.jpeg',
+    '/animales/9.jpeg',
+    '/animales/10.jpeg',
+];
+
+// Configuración de los módulos que vamos a usar
+const modules = [Autoplay, Pagination, Navigation];
 </script>
 
 <template>
@@ -12,50 +36,50 @@
                 <h2>VILLA PIRRITX</h2>
             </div>
 
-            <div class="centre capaBlanca">
+            <div class="centre capaBlanca bloque-derecho">
                 <div>
                     <p class="textCentre">
                         Gracias a nuestra labor desinteresada y a vuestra ayuda hemos conseguido salvar a un gran número
                         de animales desde que en 2016 se creara Villa Pirritx.
                     </p>
+                    <p class="textCentre">
+                        Desde perros y gatos hasta aves y pequeños mamíferos, ¡incluso cabras! han pasado por nuestras
+                        manos buscando un nuevo hogar.
+                    </p>
                 </div>
 
 
                 <div class="miniRosa">
-                    <p class="numero-grande">1050</p>
+                    <p class="numero-grande">> 100</p>
                     <p>animales ayudados</p>
                 </div>
 
-                <div class="stats-container">
-                    <div class="horizontal">
-                        <img class="logoPeq" src="/iconos/perro.png" alt="Perros">
-                        <div>
-                            <p>Perros</p>
-                            <p class="numero-grande">500</p>
-                        </div>
-
-                    </div>
-                    <div class="horizontal">
-                        <img class="logoPeq" src="/iconos/gato.png" alt="Gatos">
-                        <div>
-                            <p>Gatos</p>
-                            <p class="numero-grande">195</p>
-                        </div>
-                    </div>
-                    <div class="horizontal">
-                        <img class="logoPeq" src="/iconos/ave.png" alt="Otros animales">
-                        <div>
-                            <p>Aves</p>
-                        <p class="numero-grande">35</p>
-                        </div>
-                    </div>
-                    <div class="horizontal">
-                        <img class="logoPeq" src="/iconos/conejo.png" alt="Otros animales">
-                        <div>
-                            <p>Otros</p>
-                            <p class="numero-grande">20</p>
-                        </div>
-                    </div>
+                <div class="carrusel-container">
+                    <swiper :spaceBetween="30" :centeredSlides="true" :loop="true" :autoplay="{
+                        delay: 3000,
+                        disableOnInteraction: false,
+                    }" :pagination="{
+                            clickable: true,
+                        }" :breakpoints="{
+                            '640': {
+                                slidesPerView: 1,
+                                spaceBetween: 20,
+                            },
+                            '768': {
+                                slidesPerView: 2,
+                                spaceBetween: 30,
+                            },
+                            '1024': {
+                                slidesPerView: 3,
+                                spaceBetween: 40,
+                            },
+                        }" :modules="modules" class="mySwiper">
+                        <swiper-slide v-for="(img, index) in imagenesCarrusel" :key="index">
+                            <div class="slide-content">
+                                <img :src="img" alt="Foto del refugio" class="img-carrusel" />
+                            </div>
+                        </swiper-slide>
+                    </swiper>
                 </div>
             </div>
 
@@ -87,60 +111,107 @@
 <style scoped>
 /* Estilos específicos de esta vista */
 
+/* Contenedor principal para evitar desbordamientos */
+.body {
+    overflow-x: hidden;
+    width: 100%;
+}
 
 .logo {
     max-width: 15rem;
+    height: auto;
+}
+
+/* El bloque de la derecha (donde está el texto y el carrusel) */
+.bloque-derecho {
+    /* Truco vital para carruseles dentro de Flexbox: evita que se salga */
+    min-width: 0;
+    width: 100%;
 }
 
 .miniRosa {
     border-radius: 1rem;
-    /* Un poco más suave */
     width: 100%;
     margin: 1rem 0;
+    text-align: center;
+    padding: 1rem;
+    background-color: var(--lightPink);
 }
 
 .numero-grande {
     font-size: 2rem;
     font-weight: bold;
     color: var(--darkPurple);
+    margin: 0;
 }
 
-.stats-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1.5rem;
-    margin-top: 1rem;
-}
-
-.logoPeq {
-    width: 5rem;
-    /* Tamaño fijo para los iconos de estadísticas */
-    height: auto;
-}
-
-.animalitos {
+/* --- ESTILOS DEL CARRUSEL --- */
+.carrusel-container {
     width: 100%;
-    max-width: 20rem;
-    /* Responsive: nunca más de 20rem, pero se adapta si es menor */
-    margin-top: 2rem;
+    /* Quitamos el max-width fijo para que se adapte al padre */
+    padding: 1rem 0;
+    margin: 0 auto;
 }
 
-.mt-2 {
-    margin-top: 2rem;
+.mySwiper {
+    width: 100%;
+    height: 300px;
+    padding-bottom: 3rem;
 }
 
-/* RESPONSIVE: MÓVIL */
-@media (max-width: 768px) {
+.slide-content {
+    width: 100%;
+    height: 100%;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.img-carrusel {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Personalizar los puntitos */
+:deep(.swiper-pagination-bullet-active) {
+    background-color: var(--darkPurple);
+}
+
+:deep(.swiper-pagination-bullet) {
+    background-color: var(--darkPurple);
+    opacity: 0.4;
+}
+
+/* --- RESPONSIVE MEJORADO --- */
+/* Cambiamos 768px por 1024px para evitar ese momento en que se corta */
+@media (max-width: 1024px) {
 
     .capaBlanca,
     .capaRosa {
         padding: 2rem 1rem;
+        /* Forzamos columna mucho antes */
         flex-direction: column;
+        align-items: center;
     }
 
-    .stats-container {
-        gap: 1rem;
+    /* Hacemos que los bloques ocupen todo el ancho en modo columna */
+    .centre,
+    .bloque-derecho {
+        width: 100%;
+        max-width: 100%;
+        text-align: center;
+        /* Opcional: centra el texto */
+    }
+
+    .logo {
+        margin-bottom: 2rem;
+        /* Separa el logo del texto */
+    }
+
+    .mySwiper {
+        height: 280px;
     }
 }
 </style>
