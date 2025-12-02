@@ -213,7 +213,7 @@ EMAIL_USE_TLS = True
 
 # --- CAMBIO IMPORTANTE ---
 # Ahora le decimos: "Busca el usuario en el archivo .env, si no está, usa el del refugio por defecto"
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'villapirritxanimaliak@gmail.com')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'geobizi@gmail.com')
 
 # La contraseña también viene del .env
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
