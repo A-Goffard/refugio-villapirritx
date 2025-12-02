@@ -208,8 +208,9 @@ JAZZMIN_UI_TWEAKS = {
 # CONFIGURACIÓN DE EMAIL (GMAIL)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False  # Apagamos TLS
+EMAIL_USE_SSL = True   # Encendemos SSL
 
 # --- CAMBIO IMPORTANTE ---
 # Ahora le decimos: "Busca el usuario en el archivo .env, si no está, usa el del refugio por defecto"
