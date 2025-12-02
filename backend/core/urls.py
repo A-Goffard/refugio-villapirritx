@@ -3,12 +3,12 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
-from animales.views import AnimalViewSet
+from animales.views import AnimalViewSet, SolicitudViewSet
 
 # Configuración del router (crea las URLs automáticamente)
 router = DefaultRouter()
 router.register(r'animales', AnimalViewSet)
-
+router.register(r'solicitudes', SolicitudViewSet)
 urlpatterns = [
     path('gestion-villapirritx/', admin.site.urls),
     path('api/', include(router.urls)), # Todo lo de la API empezará por /api/

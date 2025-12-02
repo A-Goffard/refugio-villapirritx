@@ -203,3 +203,20 @@ JAZZMIN_UI_TWEAKS = {
     },
     "actions_sticky_top": False
 }
+
+
+# CONFIGURACIÓN DE EMAIL (GMAIL)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# --- CAMBIO IMPORTANTE ---
+# Ahora le decimos: "Busca el usuario en el archivo .env, si no está, usa el del refugio por defecto"
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'villapirritxanimaliak@gmail.com')
+
+# La contraseña también viene del .env
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+
+# El remitente y destinatario será el mismo que el usuario configurado
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

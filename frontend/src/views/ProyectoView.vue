@@ -104,6 +104,7 @@ const modules = [Autoplay, Pagination, Navigation];
                 </p>
             </div>
         </div>
+        
 
     </div>
 </template>

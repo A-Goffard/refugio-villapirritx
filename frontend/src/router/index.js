@@ -8,9 +8,11 @@ import ColaboraView from "@/views/ColaboraView.vue";
 import ProyectoView from "@/views/ProyectoView.vue";
 import EventosView from "@/views/EventosView.vue";
 import ContactoView from "@/views/ContactoView.vue";
+import FormularioView from "@/views/FormularioView.vue";
 // import InteresView from "@/views/InteresView.vue";
 import SubidaView from "@/views/SubidaView.vue";
 import GestionAdopcionesView from "@/views/GestionAdopcionesView.vue";
+
 
 // NOTA: No hace falta importar Header y Footer aquí, 
 // porque ya están puestos fijos en App.vue. 
@@ -40,6 +42,7 @@ const router = createRouter({
     { path: "/eventos", name: "eventos", component: EventosView },
     { path: "/contacta", name: "contacto", component: ContactoView },
     // { path: "/interes", name: "interes", component: InteresView },
+    { path: "/formulario", name: "formulario", component: FormularioView },
     
     // Rutas admin
     { path: "/subida", name: "subida", component: SubidaView },
