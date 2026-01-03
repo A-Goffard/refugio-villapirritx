@@ -2,34 +2,32 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
-// Variables de datos
+// --- DATOS ---
 const animales = ref([])
 const cargando = ref(true)
 const error = ref(null)
 
-// --- NUEVO: Lógica para la Ventana Modal ---
-const animalSeleccionado = ref(null) // Guardará el animal que el usuario está mirando
+// --- MODAL ---
+const animalSeleccionado = ref(null)
 
 const abrirModal = (animal) => {
   animalSeleccionado.value = animal
-  // Evitar que el fondo se mueva al hacer scroll
   document.body.style.overflow = 'hidden'
 }
 
 const cerrarModal = () => {
   animalSeleccionado.value = null
-  // Devolver el scroll a la normalidad
   document.body.style.overflow = 'auto'
 }
-// -------------------------------------------
 
+// --- CARGA ---
 onMounted(async () => {
   try {
     const response = await axios.get('/api/animales/')
     animales.value = response.data.filter(a => a.estado === 'ADOPCION' || a.estado === 'URGENTE')
   } catch (e) {
     console.error(e)
-    error.value = "Hubo un problema cargando los peludos. Inténtalo más tarde."
+    error.value = "Hubo un problema cargando los peludos."
   } finally {
     cargando.value = false
   }
@@ -38,38 +36,32 @@ onMounted(async () => {
 
 <template>
   <div class="body">
-<div class="capaBlanca layout-vertical">
+    
+    <div class="capaBlanca vista-adopcion">
        
-       <div class="centre encabezado">
+       <div class="encabezado">
           <img src="/iconos/patita.png" class="patita-titulo" alt="huella">
           <h2>Animales en Adopción</h2>
           <p>Haz clic en su foto para conocer su historia.</p>
        </div>
 
-       <div v-if="cargando" class="centre loading-container">
-          <img src="/iconos/patita.png" class="patita-animada" alt="Cargando...">
+       <div v-if="cargando" class="loading-container">
+          <img src="/iconos/patita.png" class="patita-animada" alt="...">
           <p>Llamando a los animales...</p>
        </div>
+       <div v-else-if="error" class="error-msg"><p>{{ error }}</p></div>
+       <div v-else-if="animales.length === 0"><p>No hay animales ahora mismo.</p></div>
 
-       <div v-else-if="error" class="textCentre error-msg">
-          <p>{{ error }}</p>
-       </div>
-
-       <div v-else-if="animales.length === 0" class="textCentre">
-          <p>¡Vaya! Ahora mismo no hay animales publicados en adopción.</p>
-       </div>
-
-       <div v-else class="animal-grid">
+       <div v-else class="cards-container">
           <div v-for="animal in animales" :key="animal.id" class="animal-card" @click="abrirModal(animal)">
               
               <div class="img-container">
                   <img v-if="animal.foto" :src="animal.foto" :alt="animal.nombre" />
-                  <img v-else src="/logos/logo.png" alt="Sin foto" class="placeholder" />
-                  
+                  <img v-else src="/logos/logo.png" class="placeholder" />
                   <span v-if="animal.estado === 'URGENTE'" class="etiqueta-urgente">¡URGENTE!</span>
               </div>
 
-              <div class="info-resumida">
+              <div class="info-card">
                   <h3>{{ animal.nombre }}</h3>
                   <p class="desc-corta">{{ animal.descripcion }}</p>
                   <button class="btnMorado">Ver detalles +</button>
@@ -80,26 +72,19 @@ onMounted(async () => {
 
     <div v-if="animalSeleccionado" class="modal-overlay" @click.self="cerrarModal">
       <div class="modal-content">
-        <button class="btn-cerrar" @click="cerrarModal">x</button>
-        
+        <button class="btn-cerrar" @click="cerrarModal">×</button>
         <div class="modal-grid">
            <div class="modal-img">
-              <img v-if="animalSeleccionado.foto" :src="animalSeleccionado.foto" :alt="animalSeleccionado.nombre">
+              <img v-if="animalSeleccionado.foto" :src="animalSeleccionado.foto">
               <img v-else src="/logos/logo.png" class="placeholder">
            </div>
-
            <div class="modal-info">
               <h2>{{ animalSeleccionado.nombre }}</h2>
-              <span class="etiqueta-estado" v-if="animalSeleccionado.estado === 'URGENTE'">Caso Urgente</span>
-              
+              <span class="etiqueta-estado" v-if="animalSeleccionado.estado === 'URGENTE'">URGENTE</span>
               <p class="modal-fecha" v-if="animalSeleccionado.fecha_nacimiento">
                  <strong>Nacimiento:</strong> {{ animalSeleccionado.fecha_nacimiento }}
               </p>
-              
-              <div class="modal-desc">
-                 <p>{{ animalSeleccionado.descripcion }}</p>
-              </div>
-
+              <div class="modal-desc"><p>{{ animalSeleccionado.descripcion }}</p></div>
               <div class="modal-acciones">
                 <router-link :to="{ path: '/solicitud', query: { animal: animalSeleccionado.nombre }}">
                    <button class="btnRosa btn-grande">Adoptar a {{ animalSeleccionado.nombre }}</button>
@@ -114,214 +99,124 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-/* --- GRID PRINCIPAL --- */
-.patita-titulo{
-    width: 80px;
-    margin-bottom: 1rem;
-}
-.layout-vertical {
-    display: flex;
-    flex-direction: column; /* Pone los elementos uno debajo de otro */
-    align-items: center;    /* Los centra horizontalmente */
-    justify-content: flex-start;
+/* --- 1. LAYOUT VERTICAL (Sobrescribe capaBlanca solo aquí) --- */
+.vista-adopcion {
+    display: flex !important;      /* Forzamos flex */
+    flex-direction: column !important; /* Dirección columna (Arriba a abajo) */
+    align-items: center;
     width: 100%;
 }
 
 .encabezado {
-    margin-bottom: 3rem; /* Un poco de aire antes de las fotos */
     text-align: center;
+    margin-bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-.animal-grid {
-    display: grid;
-    /* Tarjetas más pequeñas (mínimo 250px) */
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 2rem;
-    padding: 1rem;
+.patita-titulo { width: 60px; margin-bottom: 0.5rem; }
+
+/* --- 2. CONTENEDOR FLEX (Sustituye al Grid) --- */
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;       /* Si no caben, bajan a la siguiente línea */
+    justify-content: center; /* Centrados en la pantalla */
+    gap: 2rem;             /* Separación entre tarjetas */
+    width: 100%;
     max-width: 1200px;
-    margin: 0 auto;
 }
 
+/* --- 3. TARJETA (Estilo Geobizi) --- */
 .animal-card {
+    width: 300px;  /* Ancho fijo base, igual que tu referencia */
     background: white;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
-    cursor: pointer; /* Manita al pasar por encima */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
     border: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
 }
 
 .animal-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
-/* Arreglo de IMAGEN ALARGADA */
+/* Imagen de la tarjeta */
 .img-container {
-    height: 200px; /* Altura fija más pequeña */
+    height: 220px;
     width: 100%;
     background-color: #f8f8f8;
     position: relative;
 }
-
 .img-container img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* CLAVE: Recorta la imagen para llenar el hueco sin deformar */
-    object-position: center top; /* Centra la imagen priorizando la parte de arriba (la cara del animal) */
+    object-fit: cover; /* Recorta para llenar */
+    object-position: center top; 
 }
 
-.info-resumida {
-    padding: 1rem;
+.info-card {
+    padding: 1.2rem;
     text-align: center;
+    flex: 1; /* Para que todos los botones queden alineados abajo si quieres */
 }
-
-.info-resumida h3 {
-    margin: 0 0 0.5rem 0;
-    color: var(--darkPurple);
-}
+.info-card h3 { color: var(--darkPurple); margin-bottom: 0.5rem; }
 
 .desc-corta {
     color: #666;
     font-size: 0.9rem;
-    /* Cortar texto a 2 líneas */
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 2; /* Cortar a 2 líneas */
     -webkit-box-orient: vertical;
     overflow: hidden;
     margin-bottom: 1rem;
 }
 
-.btn-ver-mas {
-    background: transparent;
-    border: 1px solid var(--lightPurple);
-    color: var(--lightPurple);
-    padding: 0.4rem 1rem;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    transition: 0.2s;
-}
-.animal-card:hover .btn-ver-mas {
-    background: var(--lightPurple);
-    color: white;
-}
-
-/* --- ESTILOS DEL MODAL (POPUP) --- */
+/* --- MODAL (POPUP) --- */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6); /* Fondo oscuro transparente */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); z-index: 1000;
+    display: flex; justify-content: center; align-items: center;
+    backdrop-filter: blur(5px);
     padding: 1rem;
-    backdrop-filter: blur(5px); /* Efecto borroso de fondo */
 }
-
 .modal-content {
-    background: white;
-    width: 100%;
-    max-width: 900px;
-    max-height: 90vh; /* Máximo el 90% de la altura de la pantalla */
-    border-radius: 20px;
-    position: relative;
-    overflow-y: auto; /* Scroll si es muy alto */
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-    animation: aparecer 0.3s ease-out;
+    background: white; width: 100%; max-width: 900px; max-height: 90vh;
+    border-radius: 20px; position: relative; overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: aparecer 0.3s ease-out;
 }
-
-.modal-grid {
-    display: flex;
-    flex-direction: row; /* Imagen a la izq, texto a la dcha */
+.modal-grid { display: flex; flex-direction: row; }
+.modal-img { flex: 1; min-height: 300px; background: #f0f0f0; }
+.modal-img img { width: 100%; height: 100%; object-fit: cover; }
+.modal-info { flex: 1; padding: 2rem; display: flex; flex-direction: column; }
+.btn-cerrar {
+    position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.9);
+    border: none; font-size: 2rem; cursor: pointer; border-radius: 50%;
+    width: 40px; height: 40px; line-height: 1; z-index: 10;
 }
+.btn-grande { width: 100%; padding: 1rem; font-size: 1.1rem; }
+.etiqueta-estado { background: #ff4757; color: white; padding: 0.3rem 0.8rem; border-radius: 5px; width: fit-content; margin-bottom: 1rem; font-weight: bold; font-size: 0.8rem;}
+.etiqueta-urgente { position: absolute; top: 10px; right: 10px; background: #ff4757; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
 
-/* En móviles, poner uno debajo de otro */
+/* --- RESPONSIVE (MÓVIL) --- */
 @media (max-width: 768px) {
+    /* En móvil, la tarjeta ocupa todo el ancho disponible */
+    .animal-card { width: 100%; max-width: 400px; }
+    
+    /* Ajustes del modal en móvil */
     .modal-grid { flex-direction: column; }
     .modal-img { height: 250px; }
+    .modal-content { width: 95%; margin: 10px; }
 }
 
-.modal-img {
-    flex: 1;
-    background: #f0f0f0;
-    min-height: 300px;
-}
-.modal-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.modal-info {
-    flex: 1;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-}
-
-.modal-info h2 {
-    color: var(--darkPurple);
-    margin-top: 0;
-    font-size: 2rem;
-}
-
-.modal-desc {
-    margin: 1.5rem 0;
-    line-height: 1.6;
-    color: #444;
-    font-size: 1.05rem;
-    white-space: pre-line; /* Respeta los saltos de línea del texto original */
-}
-
-.btn-cerrar {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    background: rgba(255,255,255,0.8);
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    line-height: 1;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    z-index: 10;
-    padding: 0;
-}
-
-.btn-grande {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1.1rem;
-}
-
-.etiqueta-estado {
-    display: inline-block;
-    background: #ff4757;
-    color: white;
-    padding: 0.3rem 0.8rem;
-    border-radius: 5px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    width: fit-content;
-}
-
-/* Animación simple */
-@keyframes aparecer {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-/* Otros estilos generales */
+/* Animaciones y utilidades */
+@keyframes aparecer { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.patita-animada { width: 60px; animation: bote 0.8s infinite alternate; margin: 0 auto; display: block;}
+@keyframes bote { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+.loading-container { text-align: center; width: 100%; margin: 2rem 0; }
 .placeholder { opacity: 0.5; padding: 2rem; object-fit: contain !important; }
-.patita-animada { width: 60px; animation: bote 0.8s infinite alternate ease-in-out; }
-.etiqueta-urgente { position: absolute; top: 10px; right: 10px; background-color: #ff4757; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
-.centre { text-align: center; }
-.textCentre { text-align: center; }
 </style>
