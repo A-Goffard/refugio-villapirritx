@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 from animales.views import AnimalViewSet, SolicitudViewSet
+from animales.views import enviar_solicitud_adopcion
 
 # Configuración del router (crea las URLs automáticamente)
 router = DefaultRouter()
@@ -12,6 +13,7 @@ router.register(r'solicitudes', SolicitudViewSet)
 urlpatterns = [
     path('gestion-villapirritx/', admin.site.urls),
     path('api/', include(router.urls)), # Todo lo de la API empezará por /api/
+    path('api/enviar-adopcion/', enviar_solicitud_adopcion),
 ]
 
 # Esto permite ver las fotos subidas mientras estamos en modo desarrollo

@@ -12,10 +12,10 @@ import FormularioView from "@/views/FormularioView.vue";
 // import InteresView from "@/views/InteresView.vue";
 import SubidaView from "@/views/SubidaView.vue";
 import GestionAdopcionesView from "@/views/GestionAdopcionesView.vue";
+import SolicitudAdopcion from "../views/SolicitudAdopcion.vue";
 
-
-// NOTA: No hace falta importar Header y Footer aquí, 
-// porque ya están puestos fijos en App.vue. 
+// NOTA: No hace falta importar Header y Footer aquí,
+// porque ya están puestos fijos en App.vue.
 // Pero si quieres dejarlos para probar, usa la ruta correcta:
 // import AppHeader from "@/components/shared/AppHeader.vue";
 // import AppFooter from "@/components/shared/AppFooter.vue";
@@ -26,13 +26,13 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     // Si le das al botón "Atrás" del navegador, vuelve donde estabas
     if (savedPosition) {
-      return savedPosition
+      return savedPosition;
     } else {
       // Si vas a una página nueva, sube arriba del todo
-      return { top: 0 }
+      return { top: 0 };
     }
   },
-  
+
   routes: [
     { path: "/", name: "home", component: HomeView },
     // { path: "/about", name: "about", component: AboutView },
@@ -43,10 +43,19 @@ const router = createRouter({
     { path: "/contacta", name: "contacto", component: ContactoView },
     // { path: "/interes", name: "interes", component: InteresView },
     { path: "/formulario", name: "formulario", component: FormularioView },
-    
+
     // Rutas admin
     { path: "/subida", name: "subida", component: SubidaView },
-    { path: "/gestion-adopciones", name: "gestion", component: GestionAdopcionesView },
+    {
+      path: "/gestion-adopciones",
+      name: "gestion",
+      component: GestionAdopcionesView,
+    },
+    {
+      path: "/solicitud",
+      name: "solicitud",
+      component: SolicitudAdopcion,
+    },
 
     // Comodín
     { path: "/:pathMatch(.*)*", redirect: "/" },
