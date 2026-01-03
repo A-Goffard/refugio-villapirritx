@@ -154,7 +154,10 @@ DEBUG = int(os.environ.get('DEBUG', 1))
 # NOTA: Asegúrate de que en el .env del servidor la variable se llame DJANGO_ALLOWED_HOSTS
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost 127.0.0.1").split(" ")
 CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "http://localhost:8082").split(" ")
-
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+if not DEBUG:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
 # --- CONFIGURACIÓN DE JAZZMIN (Tu panel bonito) ---
 # ... (Todo el bloque de JAZZMIN déjalo igual, está perfecto) ...
 # --- CONFIGURACIÓN DE JAZZMIN (DISEÑO DEL PANEL) ---
