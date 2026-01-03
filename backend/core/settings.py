@@ -157,8 +157,57 @@ CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "http://loc
 
 # --- CONFIGURACIÓN DE JAZZMIN (Tu panel bonito) ---
 # ... (Todo el bloque de JAZZMIN déjalo igual, está perfecto) ...
-JAZZMIN_SETTINGS = { ... } # (Lo resumo para no ocupar espacio, pero tú déjalo)
-JAZZMIN_UI_TWEAKS = { ... }
+# --- CONFIGURACIÓN DE JAZZMIN (DISEÑO DEL PANEL) ---
+JAZZMIN_SETTINGS = {
+    # Título de la pestaña del navegador
+    "site_title": "Villa Pirritx Admin",
+    "site_header": "Villa Pirritx",
+    "site_brand": "Administración",
+    "site_logo": "img/logo.png",
+    "login_logo": "img/logo.png",
+    "welcome_sign": "Bienvenido al Panel de Gestión",
+    "copyright": "Asociación Villa Pirritx",
+    "search_model": ["animales.Animal"],
+
+    # Menú lateral
+    "topmenu_links": [
+        {"name": "Ir a la Web", "url": "/", "new_window": True},
+    ],
+    "show_ui_builder": False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-indigo",
+    "accent": "accent-fuchsia",
+    "navbar": "navbar-indigo navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-light-fuchsia",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    },
+    "actions_sticky_top": False
+}
 
 
 # --- CONFIGURACIÓN DE EMAIL (BREVO / SENDINBLUE) ---
