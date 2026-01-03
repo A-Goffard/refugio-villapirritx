@@ -79,13 +79,13 @@ const enviarFormulario = async () => {
           </div>
 
           <div class="campo">
-            <label>Teléfono (Opcional)</label>
-            <input type="tel" v-model="formulario.telefono" placeholder="600 000 000" />
+            <label>Teléfono *</label>
+            <input type="tel" v-model="formulario.telefono" required placeholder="600 000 000" />
           </div>
 
           <div class="campo">
             <label>Cuéntanos un poco sobre ti *</label>
-            <textarea v-model="formulario.mensaje" required rows="4" placeholder="¿Tienes más animales? ¿Vives en piso o casa?"></textarea>
+            <textarea v-model="formulario.mensaje" required rows="4" placeholder="¿Tienes más animales? ¿Vives en piso o casa? ¿Hay niñas o niños en tu casa?"></textarea>
           </div>
 
           <div v-if="error" class="error-msg">{{ error }}</div>
