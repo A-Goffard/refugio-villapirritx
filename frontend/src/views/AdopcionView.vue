@@ -72,7 +72,7 @@ onMounted(async () => {
 
     <div v-if="animalSeleccionado" class="modal-overlay" @click.self="cerrarModal">
       <div class="modal-content">
-        <button class="btn-cerrar" @click="cerrarModal">×</button>
+        <button class="btn-cerrar" @click="cerrarModal">X</button>
         <div class="modal-grid">
            <div class="modal-img">
               <img v-if="animalSeleccionado.foto" :src="animalSeleccionado.foto">
@@ -195,8 +195,8 @@ onMounted(async () => {
 .modal-info { flex: 1; padding: 2rem; display: flex; flex-direction: column; }
 .btn-cerrar {
     position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.9);
-    border: none; font-size: 2rem; cursor: pointer; border-radius: 50%;
-    width: 40px; height: 40px; line-height: 1; z-index: 10;
+    border: none; font-size: 2.5rem; cursor: pointer; border-radius: 50%;
+    width: 55px; height: 55px; line-height: 1; z-index: 10; padding: 0;
 }
 .btn-grande { width: 100%; padding: 1rem; font-size: 1.1rem; }
 .etiqueta-estado { background: #ff4757; color: white; padding: 0.3rem 0.8rem; border-radius: 5px; width: fit-content; margin-bottom: 1rem; font-weight: bold; font-size: 0.8rem;}
