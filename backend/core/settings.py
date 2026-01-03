@@ -136,6 +136,20 @@ import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Lógica inteligente:
+# Si DEBUG es False (estamos en el VPS), forzamos HTTPS en las fotos.
+# Si estamos en casa, usamos la ruta normal.
+if not DEBUG:
+    MEDIA_URL = 'https://villapirritx.org/media/'
+    
+    # SEGURIDAD ADICIONAL PARA PRODUCCIÓN
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True # Redirige todo el tráfico HTTP a HTTPS
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+else:
+    MEDIA_URL = '/media/'
+
 # --- CORS (Quién puede pedir datos al backend) ---
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
