@@ -136,88 +136,42 @@ import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# --- CORS (Quién puede pedir datos al backend) ---
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://villapirritx.org",      # <--- AÑADIDO PARA LA WEB REAL
+    "https://www.villapirritx.org",  # <--- AÑADIDO POR SI ACASO
 ]
 
 import os
 
-# SECRET_KEY: Si existe la variable de entorno, úsala. Si no (en local), usa una insegura por defecto.
+# SECRET_KEY y DEBUG: Leen del entorno
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-clave-para-local')
-
-# DEBUG: En local será True, en el servidor será False (según el docker-compose)
 DEBUG = int(os.environ.get('DEBUG', 1))
 
+# Host permitidos y CSRF
+# NOTA: Asegúrate de que en el .env del servidor la variable se llame DJANGO_ALLOWED_HOSTS
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost 127.0.0.1").split(" ")
 CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "http://localhost:8082").split(" ")
 
-# --- CONFIGURACIÓN DE JAZZMIN (DISEÑO DEL PANEL) ---
-JAZZMIN_SETTINGS = {
-    # Título de la pestaña del navegador
-    "site_title": "Villa Pirritx Admin",
-    "site_header": "Villa Pirritx",
-    "site_brand": "Administración",
-    "site_logo": "img/logo.png",# Puedes poner ruta relativa si subes el logo a static
-    "login_logo": "img/logo.png",
-    "welcome_sign": "Bienvenido al Panel de Gestión",
-    "copyright": "Asociación Villa Pirritx",
-    "search_model": ["animales.Animal"],
-
-    # Menú lateral
-    "topmenu_links": [
-        {"name": "Ir a la Web", "url": "/", "new_window": True},
-    ],
-    "show_ui_builder": False, # Ponlo en True si quieres jugar con los colores en vivo
-}
-
-JAZZMIN_UI_TWEAKS = {
-    "navbar_small_text": False,
-    "footer_small_text": False,
-    "body_small_text": False,
-    "brand_small_text": False,
-    "brand_colour": "navbar-indigo",
-    "accent": "accent-fuchsia",
-    "navbar": "navbar-indigo navbar-dark",
-    "no_navbar_border": False,
-    "navbar_fixed": False,
-    "layout_boxed": False,
-    "footer_fixed": False,
-    "sidebar_fixed": False,
-    "sidebar": "sidebar-light-fuchsia",
-    "sidebar_nav_small_text": False,
-    "sidebar_disable_expand": False,
-    "sidebar_nav_child_indent": False,
-    "sidebar_nav_compact_style": False,
-    "sidebar_nav_legacy_style": False,
-    "sidebar_nav_flat_style": False,
-    "theme": "default",
-    "dark_mode_theme": None,
-    "button_classes": {
-        "primary": "btn-primary",
-        "secondary": "btn-secondary",
-        "info": "btn-info",
-        "warning": "btn-warning",
-        "danger": "btn-danger",
-        "success": "btn-success"
-    },
-    "actions_sticky_top": False
-}
+# --- CONFIGURACIÓN DE JAZZMIN (Tu panel bonito) ---
+# ... (Todo el bloque de JAZZMIN déjalo igual, está perfecto) ...
+JAZZMIN_SETTINGS = { ... } # (Lo resumo para no ocupar espacio, pero tú déjalo)
+JAZZMIN_UI_TWEAKS = { ... }
 
 
-# CONFIGURACIÓN DE EMAIL (GMAIL)
+# --- CONFIGURACIÓN DE EMAIL (BREVO / SENDINBLUE) ---
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 465
-EMAIL_USE_TLS = False  # Apagamos TLS
-EMAIL_USE_SSL = True   # Encendemos SSL
+EMAIL_HOST = 'smtp-relay.brevo.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
 
-# --- CAMBIO IMPORTANTE ---
-# Ahora le decimos: "Busca el usuario en el archivo .env, si no está, usa el del refugio por defecto"
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'geobizi@gmail.com')
-
-# La contraseña también viene del .env
+# Credenciales técnicas (Login y Clave) leídas del .env
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '') 
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 
-# El remitente y destinatario será el mismo que el usuario configurado
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# REMITENTE PÚBLICO (Lo que ve la gente)
+# Aquí ponemos el correo real, NO el usuario técnico de Brevo
+DEFAULT_FROM_EMAIL = 'villapirritxanimaliak@gmail.com'
