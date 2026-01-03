@@ -1,234 +1,327 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import axios from "axios";
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
-// Variables para guardar los datos
-const animales = ref([]);
-const cargando = ref(true);
-const error = ref(null);
+// Variables de datos
+const animales = ref([])
+const cargando = ref(true)
+const error = ref(null)
 
-// Cuando la página se carga, pedimos los datos
+// --- NUEVO: Lógica para la Ventana Modal ---
+const animalSeleccionado = ref(null) // Guardará el animal que el usuario está mirando
+
+const abrirModal = (animal) => {
+  animalSeleccionado.value = animal
+  // Evitar que el fondo se mueva al hacer scroll
+  document.body.style.overflow = 'hidden'
+}
+
+const cerrarModal = () => {
+  animalSeleccionado.value = null
+  // Devolver el scroll a la normalidad
+  document.body.style.overflow = 'auto'
+}
+// -------------------------------------------
+
 onMounted(async () => {
   try {
-    // Petición a tu Django local
-    const response = await axios.get("/api/animales/");
-
-    // Filtramos solo los que están en ADOPCION o URGENTE
-    animales.value = response.data.filter(
-      (a) => a.estado === "ADOPCION" || a.estado === "URGENTE"
-    );
+    const response = await axios.get('/api/animales/')
+    animales.value = response.data.filter(a => a.estado === 'ADOPCION' || a.estado === 'URGENTE')
   } catch (e) {
-    console.error(e);
-    error.value = "Hubo un problema cargando los peludos. Inténtalo más tarde.";
+    console.error(e)
+    error.value = "Hubo un problema cargando los peludos. Inténtalo más tarde."
   } finally {
-    cargando.value = false;
+    cargando.value = false
   }
-});
+})
 </script>
 
 <template>
   <div class="body">
-    <div class="capaBlanca">
-      <div class="centre encabezado">
-        <img src="/iconos/patita.png" class="patita-titulo" alt="huella" />
-        <h2>Animales en Adopción</h2>
-        <p>
-          Estos pequeños buscan una segunda oportunidad. ¿Eres tú su familia?
-        </p>
-      </div>
+<div class="capaBlanca layout-vertical">
+       
+       <div class="centre encabezado">
+          <img src="/iconos/patita.png" class="patita-titulo" alt="huella">
+          <h2>Animales en Adopción</h2>
+          <p>Haz clic en su foto para conocer su historia.</p>
+       </div>
 
-      <div v-if="cargando" class="centre loading-container">
-        <img
-          src="/iconos/patita.png"
-          class="patita-animada"
-          alt="Cargando..."
-        />
-        <p>Llamando a los animales...</p>
-      </div>
+       <div v-if="cargando" class="centre loading-container">
+          <img src="/iconos/patita.png" class="patita-animada" alt="Cargando...">
+          <p>Llamando a los animales...</p>
+       </div>
 
-      <div v-else-if="error" class="textCentre error-msg">
-        <p>{{ error }}</p>
-      </div>
+       <div v-else-if="error" class="textCentre error-msg">
+          <p>{{ error }}</p>
+       </div>
 
-      <div v-else-if="animales.length === 0" class="textCentre">
-        <p>¡Vaya! Ahora mismo no hay animales publicados en adopción.</p>
-      </div>
+       <div v-else-if="animales.length === 0" class="textCentre">
+          <p>¡Vaya! Ahora mismo no hay animales publicados en adopción.</p>
+       </div>
 
-      <div v-else class="animal-grid">
-        <div v-for="animal in animales" :key="animal.id" class="animal-card">
-          <div class="img-container">
-            <img v-if="animal.foto" :src="animal.foto" :alt="animal.nombre" />
-            <img
-              v-else
-              src="/logos/logo.png"
-              alt="Sin foto"
-              class="placeholder"
-            />
+       <div v-else class="animal-grid">
+          <div v-for="animal in animales" :key="animal.id" class="animal-card" @click="abrirModal(animal)">
+              
+              <div class="img-container">
+                  <img v-if="animal.foto" :src="animal.foto" :alt="animal.nombre" />
+                  <img v-else src="/logos/logo.png" alt="Sin foto" class="placeholder" />
+                  
+                  <span v-if="animal.estado === 'URGENTE'" class="etiqueta-urgente">¡URGENTE!</span>
+              </div>
 
-            <span v-if="animal.estado === 'URGENTE'" class="etiqueta-urgente"
-              >¡URGENTE!</span
-            >
+              <div class="info-resumida">
+                  <h3>{{ animal.nombre }}</h3>
+                  <p class="desc-corta">{{ animal.descripcion }}</p>
+                  <button class="btnMorado">Ver detalles +</button>
+              </div>
           </div>
+       </div>
+    </div>
 
-          <div class="info">
-            <div class="info-header">
-              <h3>{{ animal.nombre }}</h3>
-              <span class="fecha-nac" v-if="animal.fecha_nacimiento">
-                Nac: {{ animal.fecha_nacimiento }}
-              </span>
-            </div>
+    <div v-if="animalSeleccionado" class="modal-overlay" @click.self="cerrarModal">
+      <div class="modal-content">
+        <button class="btn-cerrar" @click="cerrarModal">x</button>
+        
+        <div class="modal-grid">
+           <div class="modal-img">
+              <img v-if="animalSeleccionado.foto" :src="animalSeleccionado.foto" :alt="animalSeleccionado.nombre">
+              <img v-else src="/logos/logo.png" class="placeholder">
+           </div>
 
-            <p class="desc">{{ animal.descripcion }}</p>
+           <div class="modal-info">
+              <h2>{{ animalSeleccionado.nombre }}</h2>
+              <span class="etiqueta-estado" v-if="animalSeleccionado.estado === 'URGENTE'">Caso Urgente</span>
+              
+              <p class="modal-fecha" v-if="animalSeleccionado.fecha_nacimiento">
+                 <strong>Nacimiento:</strong> {{ animalSeleccionado.fecha_nacimiento }}
+              </p>
+              
+              <div class="modal-desc">
+                 <p>{{ animalSeleccionado.descripcion }}</p>
+              </div>
 
-            <div class="acciones">
-              <router-link
-                :to="{ path: '/solicitud', query: { animal: animal.nombre } }"
-              >
-                <button class="btnRosa">Preguntar por mí</button>
-              </router-link>
-            </div>
-          </div>
+              <div class="modal-acciones">
+                <router-link :to="{ path: '/solicitud', query: { animal: animalSeleccionado.nombre }}">
+                   <button class="btnRosa btn-grande">Adoptar a {{ animalSeleccionado.nombre }}</button>
+                </router-link>
+              </div>
+           </div>
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
 <style scoped>
-/* Estilos para que quede bonito y responsive */
-.encabezado {
-  margin-bottom: 2rem;
-  text-align: center;
+/* --- GRID PRINCIPAL --- */
+.patita-titulo{
+    width: 80px;
+    margin-bottom: 1rem;
 }
-.patita-titulo {
-  width: 3rem;
-  margin-bottom: 0.5rem;
+.layout-vertical {
+    display: flex;
+    flex-direction: column; /* Pone los elementos uno debajo de otro */
+    align-items: center;    /* Los centra horizontalmente */
+    justify-content: flex-start;
+    width: 100%;
 }
 
+.encabezado {
+    margin-bottom: 3rem; /* Un poco de aire antes de las fotos */
+    text-align: center;
+}
 .animal-grid {
-  display: grid;
-  /* Esto hace que sea responsive automático: columnas de mínimo 300px */
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  padding: 1rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
+    display: grid;
+    /* Tarjetas más pequeñas (mínimo 250px) */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .animal-card {
-  background: var(--white);
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #f0f0f0;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    cursor: pointer; /* Manita al pasar por encima */
+    border: 1px solid #eee;
 }
 
 .animal-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
+/* Arreglo de IMAGEN ALARGADA */
 .img-container {
-  height: 250px;
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-  background-color: var(--lightPurple);
+    height: 200px; /* Altura fija más pequeña */
+    width: 100%;
+    background-color: #f8f8f8;
+    position: relative;
 }
 
 .img-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Recorta la imagen para llenar el hueco sin deformar */
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* CLAVE: Recorta la imagen para llenar el hueco sin deformar */
+    object-position: center top; /* Centra la imagen priorizando la parte de arriba (la cara del animal) */
 }
 
-.placeholder {
-  object-fit: contain !important;
-  padding: 2rem;
-  opacity: 0.5;
+.info-resumida {
+    padding: 1rem;
+    text-align: center;
 }
 
-.etiqueta-urgente {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: #ff4757;
-  color: white;
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  font-weight: bold;
-  font-size: 0.8rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+.info-resumida h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--darkPurple);
 }
 
-.info {
-  padding: 1.5rem;
-  flex: 1; /* Ocupa el espacio restante */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.desc-corta {
+    color: #666;
+    font-size: 0.9rem;
+    /* Cortar texto a 2 líneas */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 1rem;
 }
 
-.info-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 0.5rem;
-  flex-wrap: wrap;
+.btn-ver-mas {
+    background: transparent;
+    border: 1px solid var(--lightPurple);
+    color: var(--lightPurple);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: 0.2s;
+}
+.animal-card:hover .btn-ver-mas {
+    background: var(--lightPurple);
+    color: white;
 }
 
-.info h3 {
-  margin: 0;
-  color: var(--darkPurple);
-  font-size: 1.5rem;
+/* --- ESTILOS DEL MODAL (POPUP) --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6); /* Fondo oscuro transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 1rem;
+    backdrop-filter: blur(5px); /* Efecto borroso de fondo */
 }
 
-.fecha-nac {
-  font-size: 0.85rem;
-  color: #888;
+.modal-content {
+    background: white;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh; /* Máximo el 90% de la altura de la pantalla */
+    border-radius: 20px;
+    position: relative;
+    overflow-y: auto; /* Scroll si es muy alto */
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    animation: aparecer 0.3s ease-out;
 }
 
-.desc {
-  color: #555;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin-bottom: 1.5rem;
-
-  /* Cortar texto si es muy largo con '...' */
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.modal-grid {
+    display: flex;
+    flex-direction: row; /* Imagen a la izq, texto a la dcha */
 }
 
-.acciones {
-  text-align: center;
+/* En móviles, poner uno debajo de otro */
+@media (max-width: 768px) {
+    .modal-grid { flex-direction: column; }
+    .modal-img { height: 250px; }
 }
 
-/* Animación de carga */
-.loading-container {
-  margin: 3rem 0;
+.modal-img {
+    flex: 1;
+    background: #f0f0f0;
+    min-height: 300px;
 }
-.patita-animada {
-  width: 60px;
-  animation: bote 0.8s infinite alternate ease-in-out;
-}
-@keyframes bote {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-15px);
-  }
+.modal-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.error-msg {
-  color: #e74c3c;
-  font-weight: bold;
-  margin: 2rem;
+.modal-info {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
 }
+
+.modal-info h2 {
+    color: var(--darkPurple);
+    margin-top: 0;
+    font-size: 2rem;
+}
+
+.modal-desc {
+    margin: 1.5rem 0;
+    line-height: 1.6;
+    color: #444;
+    font-size: 1.05rem;
+    white-space: pre-line; /* Respeta los saltos de línea del texto original */
+}
+
+.btn-cerrar {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: rgba(255,255,255,0.8);
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    z-index: 10;
+    padding: 0;
+}
+
+.btn-grande {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+}
+
+.etiqueta-estado {
+    display: inline-block;
+    background: #ff4757;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    width: fit-content;
+}
+
+/* Animación simple */
+@keyframes aparecer {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Otros estilos generales */
+.placeholder { opacity: 0.5; padding: 2rem; object-fit: contain !important; }
+.patita-animada { width: 60px; animation: bote 0.8s infinite alternate ease-in-out; }
+.etiqueta-urgente { position: absolute; top: 10px; right: 10px; background-color: #ff4757; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
+.centre { text-align: center; }
+.textCentre { text-align: center; }
 </style>
