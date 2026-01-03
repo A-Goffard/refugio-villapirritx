@@ -21,10 +21,18 @@ const cerrarModal = () => {
 }
 const hacerUrlSegura = (url) => {
     if (!url) return null; // Si no hay foto, devuelve null
-    // Si la url empieza por http:// (inseguro), lo cambiamos a https://
+    
+    // --- NUEVO: EXCEPCIÓN PARA LOCAL ---
+    // Si la URL es de tu ordenador, NO la toques (deja que sea http)
+    if (url.includes('127.0.0.1') || url.includes('localhost')) {
+        return url;
+    }
+
+    // Si es la web real y viene con http, lo pasamos a https
     if (url.startsWith('http://')) {
         return url.replace('http://', 'https://');
     }
+    
     return url;
 }
 // --- CARGA ---
