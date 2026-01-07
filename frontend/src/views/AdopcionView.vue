@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+// 1. AÑADIR 'onUnmounted' AQUÍ ARRIBA
+import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 
 // --- DATOS ---
@@ -12,29 +13,37 @@ const animalSeleccionado = ref(null)
 
 const abrirModal = (animal) => {
     animalSeleccionado.value = animal
-    document.body.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden' // Bloquea el scroll
 }
 
 const cerrarModal = () => {
     animalSeleccionado.value = null
-    document.body.style.overflow = 'auto'
+    document.body.style.overflow = 'auto'   // Desbloquea el scroll
 }
+
+// 2. AÑADIR ESTO AL FINAL DEL SCRIPT
+// Esto asegura que si te cambias de página con el modal abierto, 
+// el scroll se arregle automáticamente.
+onUnmounted(() => {
+    document.body.style.overflow = 'auto'
+})
+
 const hacerUrlSegura = (url) => {
-    if (!url) return null; // Si no hay foto, devuelve null
+    if (!url) return null; 
     
-    // --- NUEVO: EXCEPCIÓN PARA LOCAL ---
-    // Si la URL es de tu ordenador, NO la toques (deja que sea http)
+    // Excepción local
     if (url.includes('127.0.0.1') || url.includes('localhost')) {
         return url;
     }
 
-    // Si es la web real y viene con http, lo pasamos a https
+    // Corrección HTTPS para la web
     if (url.startsWith('http://')) {
         return url.replace('http://', 'https://');
     }
     
     return url;
 }
+
 // --- CARGA ---
 onMounted(async () => {
     try {
