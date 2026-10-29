@@ -44,3 +44,5 @@ backend/media/
 .env.prod
 .env.*
 backend/.env
+__pycache__/
+*.pyc
