@@ -171,9 +171,9 @@ onMounted(async () => {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* Imagen de la tarjeta */
+/* Imagen de la tarjeta: mismo formato que el recortador del panel (PROPORCION_FOTO) */
 .img-container {
-    height: 220px;
+    aspect-ratio: 4 / 3;
     width: 100%;
     background-color: #f8f8f8;
     position: relative;
@@ -245,13 +245,14 @@ onMounted(async () => {
 
 .modal-img {
     flex: 1;
-    min-height: 300px;
+    align-self: flex-start;
     background: #f0f0f0;
 }
 
 .modal-img img {
+    display: block;
     width: 100%;
-    height: 100%;
+    aspect-ratio: 4 / 3;
     object-fit: cover;
 }
 
@@ -322,7 +323,7 @@ onMounted(async () => {
     }
 
     .modal-img {
-        height: 250px;
+        align-self: stretch;
     }
 
     .modal-content {

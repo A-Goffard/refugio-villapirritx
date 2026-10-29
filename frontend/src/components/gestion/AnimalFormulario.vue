@@ -2,8 +2,8 @@
 import { ref, computed, onUnmounted } from 'vue'
 import axios from 'axios'
 import { hacerUrlSegura } from '@/utils/urls'
-import { reducirImagen } from '@/utils/imagenes'
 import { ESTADOS } from './estados'
+import RecortadorFoto from './RecortadorFoto.vue'
 import { esSesionCaducada } from '@/stores/auth'
 
 // Si recibe un animal, lo edita; si no, crea uno nuevo
@@ -18,22 +18,39 @@ const form = ref({
     fecha_nacimiento: props.animal?.fecha_nacimiento ?? '',
     descripcion: props.animal?.descripcion ?? '',
 })
-const fotoNueva = ref(null)
+const fotoOriginal = ref(null)   // la foto tal cual sale del móvil (para poder reencuadrarla)
+const recortando = ref(false)
+const fotoNueva = ref(null)      // la foto ya recortada que se subirá
 const previsualizacion = ref(null)
-const preparandoFoto = ref(false)
 const guardando = ref(false)
 const errorMsg = ref('')
 
 const fotoVisible = computed(() => previsualizacion.value || hacerUrlSegura(props.animal?.foto))
 
-const elegirFoto = async (evento) => {
+const elegirFoto = (evento) => {
     const archivo = evento.target.files[0]
+    evento.target.value = '' // para poder volver a elegir la misma foto
     if (!archivo) return
-    preparandoFoto.value = true
-    fotoNueva.value = await reducirImagen(archivo)
+    fotoOriginal.value = archivo
+    recortando.value = true
+}
+
+const usarFoto = (archivo) => {
+    fotoNueva.value = archivo
     if (previsualizacion.value) URL.revokeObjectURL(previsualizacion.value)
-    previsualizacion.value = URL.createObjectURL(fotoNueva.value)
-    preparandoFoto.value = false
+    previsualizacion.value = URL.createObjectURL(archivo)
+    recortando.value = false
+}
+
+// Si el navegador no puede abrir la foto para recortarla, se sube entera (el servidor la reduce)
+const fotoSinRecortar = () => {
+    usarFoto(fotoOriginal.value)
+    fotoOriginal.value = null
+}
+
+const cancelarRecorte = () => {
+    recortando.value = false
+    if (!fotoNueva.value) fotoOriginal.value = null
 }
 
 onUnmounted(() => {
@@ -76,15 +93,21 @@ const guardar = async () => {
         <button class="btn-cerrar" type="button" @click="emit('cerrar')" aria-label="Cerrar">×</button>
         <h2>{{ animal ? `Editar a ${animal.nombre}` : 'Nuevo animal' }}</h2>
 
-        <form @submit.prevent="guardar" class="mi-formulario">
-            <label class="selector-foto">
-                <img v-if="fotoVisible" :src="fotoVisible" alt="Foto del animal">
-                <span v-else class="sin-foto">📷</span>
-                <span class="texto-foto">
-                    {{ preparandoFoto ? 'Preparando foto...' : (fotoVisible ? 'Cambiar foto' : 'Hacer o elegir foto') }}
-                </span>
-                <input type="file" accept="image/*" @change="elegirFoto" hidden>
-            </label>
+        <RecortadorFoto v-if="recortando" :archivo="fotoOriginal"
+            @listo="usarFoto" @cancelar="cancelarRecorte" @error="fotoSinRecortar" />
+
+        <form v-show="!recortando" @submit.prevent="guardar" class="mi-formulario">
+            <div class="foto">
+                <label class="selector-foto">
+                    <img v-if="fotoVisible" :src="fotoVisible" alt="Foto del animal">
+                    <span v-else class="sin-foto">📷</span>
+                    <span class="texto-foto">{{ fotoVisible ? 'Cambiar foto' : 'Hacer o elegir foto' }}</span>
+                    <input type="file" accept="image/*" @change="elegirFoto" hidden>
+                </label>
+                <button v-if="fotoOriginal" type="button" class="btn-reencuadrar" @click="recortando = true">
+                    Volver a encuadrar
+                </button>
+            </div>
 
             <div class="campo">
                 <label for="nombre">Nombre</label>
@@ -112,7 +135,7 @@ const guardar = async () => {
 
             <div v-if="errorMsg" class="error">{{ errorMsg }}</div>
 
-            <button type="submit" class="btnMorado full-width" :disabled="guardando || preparandoFoto">
+            <button type="submit" class="btnMorado full-width" :disabled="guardando">
                 {{ guardando ? 'Guardando...' : 'Guardar' }}
             </button>
         </form>
@@ -174,11 +197,23 @@ h2 { color: var(--darkPurple); margin: 0 3rem 1rem 0; }
     background: #fdf7ff;
 }
 
+/* Mismo formato que la tarjeta de la web (PROPORCION_FOTO) */
 .selector-foto img {
     width: 100%;
-    max-height: 260px;
+    aspect-ratio: 4 / 3;
     object-fit: cover;
     border-radius: 0.6rem;
+}
+
+.foto { display: flex; flex-direction: column; align-items: center; }
+
+.btn-reencuadrar {
+    margin: 0.5rem 0 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+    color: var(--darkPurple);
+    text-decoration: underline;
 }
 
 .sin-foto { font-size: 3rem; }
