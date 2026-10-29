@@ -3,12 +3,14 @@ import tempfile
 from io import BytesIO
 
 from django.contrib.auth.models import User
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from PIL import Image
 from rest_framework.test import APITestCase
 
-from .models import Animal, Evento, Solicitud
+from . import cuestionario
+from .models import Animal, Evento, Solicitud, SolicitudAdopcion
 
 MEDIA_TEMPORAL = tempfile.mkdtemp()
 
@@ -153,3 +155,88 @@ class EventoGestionTests(APITestCase):
         self.assertEqual(respuesta.status_code, 200)
         self.assertIsNone(respuesta.data['imagen'])
         self.assertFalse(evento.imagen.storage.exists(archivo))
+
+
+def respuestas_obligatorias(especie):
+    respuestas = {p['clave']: 'Respuesta de prueba' for p in cuestionario.preguntas(especie) if p['obligatoria']}
+    respuestas.update(nombre='Ane Etxebarria', email='ane@example.com', telefono='600 000 000')
+    return respuestas
+
+
+@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+class SolicitudAdopcionTests(APITestCase):
+    url = '/api/solicitudes-adopcion/'
+
+    def setUp(self):
+        self.gata = Animal.objects.create(nombre='Txuri', especie='GATO', descripcion='Muy cariñosa')
+
+    def enviar(self, **cambios):
+        datos = {'animal': self.gata.id, 'acepta_privacidad': True, 'respuestas': respuestas_obligatorias('GATO')}
+        datos.update(cambios)
+        return self.client.post(self.url, datos, format='json')
+
+    def test_cuestionario_publico_por_especie(self):
+        perro = self.client.get('/api/cuestionario/perro/').data
+        gato = self.client.get('/api/cuestionario/GATO/').data
+        claves_gato = [p['clave'] for s in gato['secciones'] for p in s['preguntas']]
+        self.assertIn('arenero', claves_gato)
+        self.assertNotIn('arenero', [p['clave'] for s in perro['secciones'] for p in s['preguntas']])
+        self.assertEqual(self.client.get('/api/cuestionario/conejo/').status_code, 404)
+
+    def test_envio_guarda_la_solicitud_y_manda_el_pdf(self):
+        respuestas = {**respuestas_obligatorias('GATO'), 'pregunta_inventada': 'x', 'estado_civil': '  '}
+        respuesta = self.enviar(respuestas=respuestas)
+        self.assertEqual(respuesta.status_code, 201)
+
+        solicitud = SolicitudAdopcion.objects.get()
+        self.assertEqual((solicitud.nombre_animal, solicitud.especie), ('Txuri', 'GATO'))
+        self.assertEqual(solicitud.email, 'ane@example.com')
+        self.assertNotIn('pregunta_inventada', solicitud.respuestas)
+        self.assertNotIn('estado_civil', solicitud.respuestas)
+        self.assertFalse(solicitud.gestionada)
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].reply_to, ['ane@example.com'])
+        nombre, contenido, tipo = mail.outbox[0].attachments[0]
+        self.assertEqual(tipo, 'application/pdf')
+        self.assertTrue(contenido.startswith(b'%PDF'))
+
+    def test_faltan_obligatorias_o_privacidad(self):
+        respuestas = respuestas_obligatorias('GATO')
+        del respuestas['dni']
+        respuesta = self.enviar(respuestas=respuestas)
+        self.assertEqual(respuesta.status_code, 400)
+        self.assertIn('dni', respuesta.data['respuestas'])
+
+        self.assertEqual(self.enviar(acepta_privacidad=False).status_code, 400)
+        self.assertEqual(self.enviar(respuestas={**respuestas_obligatorias('GATO'), 'email': 'no-es-email'}).status_code, 400)
+        self.assertFalse(SolicitudAdopcion.objects.exists())
+
+    def test_publico_no_puede_leer_ni_descargar(self):
+        self.enviar()
+        solicitud = SolicitudAdopcion.objects.get()
+        self.assertEqual(self.client.get(self.url).status_code, 403)
+        self.assertEqual(self.client.get(f'{self.url}{solicitud.id}/pdf/').status_code, 403)
+
+    def test_staff_ve_descarga_y_marca_gestionada(self):
+        self.enviar()
+        solicitud = SolicitudAdopcion.objects.get()
+        self.client.force_authenticate(User.objects.create_user('refugio', password='x', is_staff=True))
+
+        self.assertEqual(len(self.client.get(self.url).data), 1)
+        pdf = self.client.get(f'{self.url}{solicitud.id}/pdf/')
+        self.assertEqual(pdf['Content-Type'], 'application/pdf')
+        self.assertTrue(pdf.content.startswith(b'%PDF'))
+
+        # Solo se puede cambiar "gestionada"; las respuestas no se tocan
+        self.client.patch(f'{self.url}{solicitud.id}/', {'gestionada': True, 'nombre': 'Otra'}, format='json')
+        solicitud.refresh_from_db()
+        self.assertTrue(solicitud.gestionada)
+        self.assertEqual(solicitud.nombre, 'Ane Etxebarria')
+
+    def test_borrar_el_animal_conserva_la_solicitud(self):
+        self.enviar()
+        self.gata.delete()
+        solicitud = SolicitudAdopcion.objects.get()
+        self.assertIsNone(solicitud.animal)
+        self.assertEqual(solicitud.nombre_animal, 'Txuri')

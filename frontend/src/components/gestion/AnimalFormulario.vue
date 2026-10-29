@@ -15,6 +15,7 @@ const emit = defineEmits(['guardado', 'cerrar', 'sesion-caducada'])
 
 const form = ref({
     nombre: props.animal?.nombre ?? '',
+    especie: props.animal?.especie ?? 'PERRO',
     estado: props.animal?.estado ?? 'ADOPCION',
     fecha_nacimiento: props.animal?.fecha_nacimiento ?? '',
     descripcion: props.animal?.descripcion ?? '',
@@ -109,6 +110,15 @@ const guardar = async () => {
         <div class="campo">
             <label for="nombre">Nombre</label>
             <input id="nombre" v-model="form.nombre" required maxlength="50">
+        </div>
+
+        <div class="campo">
+            <label for="especie">Especie</label>
+            <select id="especie" v-model="form.especie">
+                <option value="PERRO">Perro</option>
+                <option value="GATO">Gato</option>
+            </select>
+            <small>Decide qué cuestionario de adopción se pide en la web.</small>
         </div>
 
         <div class="campo">

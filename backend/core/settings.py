@@ -227,17 +227,19 @@ JAZZMIN_UI_TWEAKS = {
 }
 
 
-# --- CONFIGURACIÓN DE EMAIL (BREVO / SENDINBLUE) ---
+# --- CONFIGURACIÓN DE EMAIL (GMAIL DEL REFUGIO) ---
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp-relay.brevo.com'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+EMAIL_TIMEOUT = 15  # Para que el formulario no se quede colgado si Gmail no responde
 
-# Credenciales técnicas (Login y Clave) leídas del .env
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '') 
+# Leídas del .env:
+# EMAIL_HOST_USER = la cuenta de Gmail del refugio
+# EMAIL_HOST_PASSWORD = una "contraseña de aplicación" de Google (16 letras), NO la contraseña normal
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'villapirritxanimaliak@gmail.com')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 
-# REMITENTE PÚBLICO (Lo que ve la gente)
-# Aquí ponemos el correo real, NO el usuario técnico de Brevo
-DEFAULT_FROM_EMAIL = 'villapirritxanimaliak@gmail.com'
+# Gmail solo deja enviar como la propia cuenta, así que remitente = usuario
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

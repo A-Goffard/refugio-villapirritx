@@ -3,10 +3,15 @@ from rest_framework.permissions import AllowAny, IsAdminUser, BasePermission, SA
 from django.contrib.auth import authenticate, login, logout
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
+from django.http import HttpResponse
+from django.utils.text import slugify
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .models import Animal, Evento, Solicitud
+from .models import Animal, Evento, Solicitud, SolicitudAdopcion
 from .serializers import AnimalSerializer, EventoSerializer, SolicitudSerializer
-from rest_framework.decorators import api_view, permission_classes
+from .serializers import SolicitudAdopcionSerializer, SolicitudAdopcionGestionSerializer
+from .pdf_adopcion import generar_pdf
+from . import cuestionario
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 
 
@@ -125,46 +130,59 @@ class SolicitudViewSet(viewsets.ModelViewSet):
             print(f"Error enviando email: {e}")
             
             
-@api_view(['POST'])
-def enviar_solicitud_adopcion(request):
-    data = request.data
-    
-    # 1. Sacamos los datos que nos envía el formulario
-    nombre_interesado = data.get('nombre')
-    email_interesado = data.get('email')
-    telefono = data.get('telefono', 'No indicado')
-    nombre_animal = data.get('animal')
-    mensaje = data.get('mensaje')
+# --- CUESTIONARIO PRE-ADOPCIÓN ---
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def ver_cuestionario(request, especie):
+    definicion = cuestionario.CUESTIONARIOS.get(especie.upper())
+    if definicion is None:
+        return Response({'error': 'Especie no válida'}, status=404)
+    return Response(definicion)
 
-    # 2. Preparamos el cuerpo del correo que TE va a llegar a ti
-    asunto = f"🐶 Nueva solicitud de adopción para: {nombre_animal}"
-    
-    cuerpo_mensaje = f"""
-    ¡Hola equipo de Villa Pirritx!
-    
-    Alguien está interesado en adoptar a {nombre_animal}.
-    
-    --- DATOS DEL INTERESADO ---
-    Nombre: {nombre_interesado}
-    Email: {email_interesado}
-    Teléfono: {telefono}
-    
-    --- MENSAJE ---
-    {mensaje}
-    """
 
-    try:
-        # 3. Enviamos el correo usando Brevo
-        # send_mail no admite reply_to, por eso usamos EmailMessage
-        email = EmailMessage(
-            asunto,
-            cuerpo_mensaje,
-            settings.DEFAULT_FROM_EMAIL, # Remitente (Villa Pirritx)
-            ['villapirritxanimaliak@gmail.com'], # Destinatario (Tú mismo)
-            # Truco: Si le das a "Responder" en Gmail, responderás al interesado, no a ti mismo
-            reply_to=[email_interesado] if email_interesado else None,
-        )
-        email.send(fail_silently=False)
-        return Response({'status': 'success', 'message': 'Correo enviado'})
-    except Exception as e:
-        return Response({'status': 'error', 'message': str(e)}, status=500)
+def nombre_pdf(solicitud):
+    return f"adopcion-{slugify(solicitud.nombre_animal)}-{slugify(solicitud.nombre)}.pdf"
+
+
+class SolicitudAdopcionViewSet(viewsets.ModelViewSet):
+    queryset = SolicitudAdopcion.objects.all()
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
+    # Cualquiera puede enviar el cuestionario; verlo, gestionarlo o borrarlo es solo del refugio
+    def get_permissions(self):
+        if self.action == 'create':
+            return [AllowAny()]
+        return [IsAdminUser()]
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return SolicitudAdopcionSerializer
+        return SolicitudAdopcionGestionSerializer
+
+    def perform_create(self, serializer):
+        solicitud = serializer.save()
+        # La solicitud ya está guardada: si el correo falla, se verá igualmente en el panel
+        try:
+            email = EmailMessage(
+                f"🐾 Nueva solicitud de adopción para {solicitud.nombre_animal}",
+                f"¡Hola equipo de Villa Pirritx!\n\n"
+                f"{solicitud.nombre} ha rellenado el cuestionario pre-adopción para "
+                f"{solicitud.nombre_animal} ({solicitud.get_especie_display().lower()}).\n\n"
+                f"Email: {solicitud.email}\nTeléfono: {solicitud.telefono}\n\n"
+                f"Tenéis el cuestionario completo en el PDF adjunto y en el panel del refugio.\n"
+                f"Si respondéis a este correo, le llegará directamente a {solicitud.nombre}.",
+                settings.DEFAULT_FROM_EMAIL,
+                [settings.DEFAULT_FROM_EMAIL],
+                reply_to=[solicitud.email],
+            )
+            email.attach(nombre_pdf(solicitud), generar_pdf(solicitud), 'application/pdf')
+            email.send(fail_silently=False)
+        except Exception as e:
+            print(f"Error enviando email de la solicitud de adopción {solicitud.id}: {e}")
+
+    @action(detail=True, methods=['get'])
+    def pdf(self, request, pk=None):
+        solicitud = self.get_object()
+        respuesta = HttpResponse(generar_pdf(solicitud), content_type='application/pdf')
+        respuesta['Content-Disposition'] = f'inline; filename="{nombre_pdf(solicitud)}"'
+        return respuesta

@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import ListaAnimales from '@/components/gestion/ListaAnimales.vue'
 import ListaEventos from '@/components/gestion/ListaEventos.vue'
+import ListaSolicitudes from '@/components/gestion/ListaSolicitudes.vue'
 import '@/assets/gestion.css'
 
 const auth = useAuthStore()
@@ -11,7 +12,8 @@ const route = useRoute()
 const router = useRouter()
 
 // La pestaña va en la URL (?seccion=eventos) para que al recargar no se pierda
-const seccion = computed(() => (route.query.seccion === 'eventos' ? 'eventos' : 'animales'))
+const SECCIONES = ['animales', 'solicitudes', 'eventos']
+const seccion = computed(() => (SECCIONES.includes(route.query.seccion) ? route.query.seccion : 'animales'))
 const irA = (nueva) => router.replace({ query: nueva === 'animales' ? {} : { seccion: nueva } })
 
 const salir = async () => {
@@ -39,10 +41,12 @@ const sesionCaducada = () => {
 
         <nav class="pestanas">
             <button :class="{ activa: seccion === 'animales' }" @click="irA('animales')">🐾 Animales</button>
+            <button :class="{ activa: seccion === 'solicitudes' }" @click="irA('solicitudes')">📨 Solicitudes</button>
             <button :class="{ activa: seccion === 'eventos' }" @click="irA('eventos')">📅 Eventos</button>
         </nav>
 
         <ListaAnimales v-if="seccion === 'animales'" @sesion-caducada="sesionCaducada" />
+        <ListaSolicitudes v-else-if="seccion === 'solicitudes'" @sesion-caducada="sesionCaducada" />
         <ListaEventos v-else @sesion-caducada="sesionCaducada" />
     </div>
 </div>

@@ -7,8 +7,14 @@ class Animal(models.Model):
         ('ADOPTADO', 'Adoptado'),
         ('URGENTE', 'Urgente'),
     ]
+    # Decide qué cuestionario de adopción se pide (ver cuestionario.py)
+    ESPECIES = [
+        ('PERRO', 'Perro'),
+        ('GATO', 'Gato'),
+    ]
 
     nombre = models.CharField(max_length=50)
+    especie = models.CharField(max_length=10, choices=ESPECIES, default='PERRO')
     fecha_nacimiento = models.DateField(null=True, blank=True)
     descripcion = models.TextField(verbose_name="Descripción e Historia")
     foto = models.ImageField(upload_to='animales/', null=True, blank=True)
@@ -43,6 +49,33 @@ class Solicitud(models.Model):
     
     class Meta:
         verbose_name_plural = "Solicitudes y Contacto"
+
+class SolicitudAdopcion(models.Model):
+    """Cuestionario pre-adopción rellenado desde la web."""
+    # Si se borra el animal, la solicitud se conserva (guardamos también su nombre)
+    animal = models.ForeignKey(Animal, on_delete=models.SET_NULL, null=True, blank=True,
+                               related_name='solicitudes_adopcion')
+    nombre_animal = models.CharField(max_length=50)
+    especie = models.CharField(max_length=10, choices=Animal.ESPECIES)
+
+    # Copiados de las respuestas para poder listar y buscar sin abrir el JSON
+    nombre = models.CharField(max_length=150)
+    email = models.EmailField()
+    telefono = models.CharField(max_length=50)
+
+    # {clave_pregunta: respuesta}, con las claves de cuestionario.py
+    respuestas = models.JSONField(default=dict)
+    fecha = models.DateTimeField(auto_now_add=True)
+    gestionada = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.nombre} → {self.nombre_animal}"
+
+    class Meta:
+        ordering = ['-fecha']
+        verbose_name = "Solicitud de adopción"
+        verbose_name_plural = "Solicitudes de adopción"
+
 
 class Evento(models.Model):
     titulo = models.CharField(max_length=100)

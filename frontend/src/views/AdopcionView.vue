@@ -102,7 +102,7 @@ onMounted(async () => {
                             <p>{{ animalSeleccionado.descripcion }}</p>
                         </div>
                         <div class="modal-acciones">
-                            <router-link :to="{ path: '/solicitud', query: { animal: animalSeleccionado.nombre } }">
+                            <router-link :to="{ path: '/solicitud', query: { animal: animalSeleccionado.id } }">
                                 <button class="btnRosa btn-grande">Adoptar a {{ animalSeleccionado.nombre }}</button>
                             </router-link>
                         </div>
