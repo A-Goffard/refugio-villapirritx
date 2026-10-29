@@ -11,3 +11,5 @@ class SolicitudSerializer(serializers.ModelSerializer):
     class Meta:
         model = Solicitud
         fields = '__all__'
+        # Que nadie pueda marcarla como gestionada desde el formulario público
+        read_only_fields = ['gestionada', 'fecha']

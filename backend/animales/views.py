@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework.permissions import AllowAny, IsAdminUser
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import Animal, Solicitud
@@ -14,6 +15,13 @@ class AnimalViewSet(viewsets.ReadOnlyModelViewSet):
 class SolicitudViewSet(viewsets.ModelViewSet):
     queryset = Solicitud.objects.all()
     serializer_class = SolicitudSerializer
+
+    # Cualquiera puede enviar una solicitud desde la web,
+    # pero solo el staff puede verlas, editarlas o borrarlas (datos personales)
+    def get_permissions(self):
+        if self.action == 'create':
+            return [AllowAny()]
+        return [IsAdminUser()]
 
     # Sobreescribimos el método de guardar para enviar el mail
     def perform_create(self, serializer):
