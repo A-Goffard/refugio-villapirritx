@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAdminUser, BasePermission, SAFE_METHODS
 from django.contrib.auth import authenticate, login, logout
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
 from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import Animal, Evento, Solicitud
@@ -155,15 +155,16 @@ def enviar_solicitud_adopcion(request):
 
     try:
         # 3. Enviamos el correo usando Brevo
-        send_mail(
+        # send_mail no admite reply_to, por eso usamos EmailMessage
+        email = EmailMessage(
             asunto,
             cuerpo_mensaje,
             settings.DEFAULT_FROM_EMAIL, # Remitente (Villa Pirritx)
             ['villapirritxanimaliak@gmail.com'], # Destinatario (Tú mismo)
-            fail_silently=False,
             # Truco: Si le das a "Responder" en Gmail, responderás al interesado, no a ti mismo
-            reply_to=[email_interesado] 
+            reply_to=[email_interesado] if email_interesado else None,
         )
+        email.send(fail_silently=False)
         return Response({'status': 'success', 'message': 'Correo enviado'})
     except Exception as e:
         return Response({'status': 'error', 'message': str(e)}, status=500)
