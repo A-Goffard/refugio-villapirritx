@@ -30,3 +30,19 @@ export async function exportarRecorte(imagen, { x, y, ancho, alto }, nombreOrigi
     const nombre = nombreOriginal.replace(/\.[^.]+$/, '') + '.jpg'
     return new File([blob], nombre, { type: 'image/jpeg' })
 }
+
+// Reduce la imagen entera, sin recortar (para carteles de eventos).
+// Si el navegador no puede leerla (p. ej. HEIC en un ordenador), se sube tal cual y la reduce el servidor.
+export async function reducirImagen(archivo) {
+    try {
+        const imagen = await cargarImagen(archivo)
+        try {
+            const todo = { x: 0, y: 0, ancho: imagen.naturalWidth, alto: imagen.naturalHeight }
+            return await exportarRecorte(imagen, todo, archivo.name)
+        } finally {
+            URL.revokeObjectURL(imagen.src)
+        }
+    } catch {
+        return archivo
+    }
+}

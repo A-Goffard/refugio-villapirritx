@@ -3,12 +3,13 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
-from animales.views import AnimalViewSet, SolicitudViewSet
+from animales.views import AnimalViewSet, EventoViewSet, SolicitudViewSet
 from animales.views import enviar_solicitud_adopcion, sesion, iniciar_sesion, cerrar_sesion
 
 # Configuración del router (crea las URLs automáticamente)
 router = DefaultRouter()
 router.register(r'animales', AnimalViewSet)
+router.register(r'eventos', EventoViewSet)
 router.register(r'solicitudes', SolicitudViewSet)
 urlpatterns = [
     path('gestion-villapirritx/', admin.site.urls),

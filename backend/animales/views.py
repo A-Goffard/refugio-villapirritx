@@ -4,8 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.mail import send_mail
 from django.conf import settings
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .models import Animal, Solicitud
-from .serializers import AnimalSerializer, SolicitudSerializer
+from .models import Animal, Evento, Solicitud
+from .serializers import AnimalSerializer, EventoSerializer, SolicitudSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
@@ -16,22 +16,36 @@ class EsStaffOSoloLectura(BasePermission):
         return request.method in SAFE_METHODS or request.user.is_staff
 
 
-class AnimalViewSet(viewsets.ModelViewSet):
+class BorraImagenViejaMixin:
+    """Al cambiar, quitar o borrar la imagen de un registro, elimina el archivo viejo del disco."""
+    campo_imagen = None
+
+    def perform_update(self, serializer):
+        anterior = getattr(serializer.instance, self.campo_imagen).name
+        objeto = serializer.save()
+        imagen = getattr(objeto, self.campo_imagen)
+        if anterior and anterior != imagen.name:
+            imagen.storage.delete(anterior)
+
+    def perform_destroy(self, instance):
+        imagen = getattr(instance, self.campo_imagen)
+        if imagen:
+            imagen.storage.delete(imagen.name)
+        instance.delete()
+
+
+class AnimalViewSet(BorraImagenViejaMixin, viewsets.ModelViewSet):
     queryset = Animal.objects.order_by('-created_at')
     serializer_class = AnimalSerializer
     permission_classes = [EsStaffOSoloLectura]
+    campo_imagen = 'foto'
 
-    # Al cambiar o borrar un animal, quitamos su foto vieja del disco
-    def perform_update(self, serializer):
-        foto_anterior = serializer.instance.foto.name
-        animal = serializer.save()
-        if foto_anterior and foto_anterior != animal.foto.name:
-            animal.foto.storage.delete(foto_anterior)
 
-    def perform_destroy(self, instance):
-        if instance.foto:
-            instance.foto.storage.delete(instance.foto.name)
-        instance.delete()
+class EventoViewSet(BorraImagenViejaMixin, viewsets.ModelViewSet):
+    queryset = Evento.objects.all()
+    serializer_class = EventoSerializer
+    permission_classes = [EsStaffOSoloLectura]
+    campo_imagen = 'imagen'
 
 
 # --- SESIÓN PARA EL PANEL DE GESTIÓN ---

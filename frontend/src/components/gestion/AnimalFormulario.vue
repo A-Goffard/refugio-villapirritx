@@ -4,6 +4,7 @@ import axios from 'axios'
 import { hacerUrlSegura } from '@/utils/urls'
 import { ESTADOS } from './estados'
 import RecortadorFoto from './RecortadorFoto.vue'
+import ModalGestion from './ModalGestion.vue'
 import { esSesionCaducada } from '@/stores/auth'
 
 // Si recibe un animal, lo edita; si no, crea uno nuevo
@@ -88,114 +89,58 @@ const guardar = async () => {
 </script>
 
 <template>
-<div class="modal-overlay" @click.self="emit('cerrar')">
-    <div class="modal-content">
-        <button class="btn-cerrar" type="button" @click="emit('cerrar')" aria-label="Cerrar">×</button>
-        <h2>{{ animal ? `Editar a ${animal.nombre}` : 'Nuevo animal' }}</h2>
+<ModalGestion :titulo="animal ? `Editar a ${animal.nombre}` : 'Nuevo animal'" @cerrar="emit('cerrar')">
+    <RecortadorFoto v-if="recortando" :archivo="fotoOriginal"
+        @listo="usarFoto" @cancelar="cancelarRecorte" @error="fotoSinRecortar" />
 
-        <RecortadorFoto v-if="recortando" :archivo="fotoOriginal"
-            @listo="usarFoto" @cancelar="cancelarRecorte" @error="fotoSinRecortar" />
-
-        <form v-show="!recortando" @submit.prevent="guardar" class="mi-formulario">
-            <div class="foto">
-                <label class="selector-foto">
-                    <img v-if="fotoVisible" :src="fotoVisible" alt="Foto del animal">
-                    <span v-else class="sin-foto">📷</span>
-                    <span class="texto-foto">{{ fotoVisible ? 'Cambiar foto' : 'Hacer o elegir foto' }}</span>
-                    <input type="file" accept="image/*" @change="elegirFoto" hidden>
-                </label>
-                <button v-if="fotoOriginal" type="button" class="btn-reencuadrar" @click="recortando = true">
-                    Volver a encuadrar
-                </button>
-            </div>
-
-            <div class="campo">
-                <label for="nombre">Nombre</label>
-                <input id="nombre" v-model="form.nombre" required maxlength="50">
-            </div>
-
-            <div class="campo">
-                <label for="estado">Estado</label>
-                <select id="estado" v-model="form.estado">
-                    <option v-for="(estado, clave) in ESTADOS" :key="clave" :value="clave">{{ estado.texto }}</option>
-                </select>
-                <small>{{ ESTADOS[form.estado].enWeb ? 'Aparecerá en la página de adopción.' : 'No aparecerá en la página de adopción.' }}</small>
-            </div>
-
-            <div class="campo">
-                <label for="fecha">Fecha de nacimiento <span class="opcional">(opcional)</span></label>
-                <input id="fecha" type="date" v-model="form.fecha_nacimiento">
-            </div>
-
-            <div class="campo">
-                <label for="descripcion">Descripción e historia</label>
-                <textarea id="descripcion" v-model="form.descripcion" rows="6" required
-                    placeholder="Cómo es, cómo llegó al refugio, con quién se lleva bien..."></textarea>
-            </div>
-
-            <div v-if="errorMsg" class="error">{{ errorMsg }}</div>
-
-            <button type="submit" class="btnMorado full-width" :disabled="guardando">
-                {{ guardando ? 'Guardando...' : 'Guardar' }}
+    <form v-show="!recortando" @submit.prevent="guardar" class="mi-formulario">
+        <div class="foto">
+            <label class="selector-foto">
+                <img v-if="fotoVisible" :src="fotoVisible" alt="Foto del animal">
+                <span v-else class="sin-foto">📷</span>
+                <span class="texto-foto">{{ fotoVisible ? 'Cambiar foto' : 'Hacer o elegir foto' }}</span>
+                <input type="file" accept="image/*" @change="elegirFoto" hidden>
+            </label>
+            <button v-if="fotoOriginal" type="button" class="btn-enlace" @click="recortando = true">
+                Volver a encuadrar
             </button>
-        </form>
-    </div>
-</div>
+        </div>
+
+        <div class="campo">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" v-model="form.nombre" required maxlength="50">
+        </div>
+
+        <div class="campo">
+            <label for="estado">Estado</label>
+            <select id="estado" v-model="form.estado">
+                <option v-for="(estado, clave) in ESTADOS" :key="clave" :value="clave">{{ estado.texto }}</option>
+            </select>
+            <small>{{ ESTADOS[form.estado].enWeb ? 'Aparecerá en la página de adopción.' : 'No aparecerá en la página de adopción.' }}</small>
+        </div>
+
+        <div class="campo">
+            <label for="fecha">Fecha de nacimiento <span class="opcional">(opcional)</span></label>
+            <input id="fecha" type="date" v-model="form.fecha_nacimiento">
+        </div>
+
+        <div class="campo">
+            <label for="descripcion">Descripción e historia</label>
+            <textarea id="descripcion" v-model="form.descripcion" rows="6" required
+                placeholder="Cómo es, cómo llegó al refugio, con quién se lleva bien..."></textarea>
+        </div>
+
+        <div v-if="errorMsg" class="error">{{ errorMsg }}</div>
+
+        <button type="submit" class="btnMorado full-width" :disabled="guardando">
+            {{ guardando ? 'Guardando...' : 'Guardar' }}
+        </button>
+    </form>
+</ModalGestion>
 </template>
 
 <style scoped>
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-}
-
-.modal-content {
-    background: white;
-    width: 100%;
-    max-width: 550px;
-    max-height: 92vh;
-    overflow-y: auto;
-    border-radius: 20px;
-    padding: 1.5rem;
-    position: relative;
-}
-
-h2 { color: var(--darkPurple); margin: 0 3rem 1rem 0; }
-
-.btn-cerrar {
-    position: absolute;
-    top: 0.8rem;
-    right: 0.8rem;
-    margin: 0;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: none;
-    border-radius: 50%;
-    background: var(--lightPurple);
-    font-size: 1.8rem;
-    line-height: 1;
-}
-
-.mi-formulario { display: flex; flex-direction: column; gap: 1.2rem; }
-
-.selector-foto {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    border: 2px dashed var(--pink);
-    border-radius: 1rem;
-    cursor: pointer;
-    background: #fdf7ff;
-}
+/* Los estilos comunes del formulario están en assets/gestion.css */
 
 /* Mismo formato que la tarjeta de la web (PROPORCION_FOTO) */
 .selector-foto img {
@@ -206,40 +151,4 @@ h2 { color: var(--darkPurple); margin: 0 3rem 1rem 0; }
 }
 
 .foto { display: flex; flex-direction: column; align-items: center; }
-
-.btn-reencuadrar {
-    margin: 0.5rem 0 0;
-    background: none;
-    border: none;
-    box-shadow: none;
-    color: var(--darkPurple);
-    text-decoration: underline;
-}
-
-.sin-foto { font-size: 3rem; }
-.texto-foto { font-weight: bold; color: var(--darkPurple); }
-
-.campo { display: flex; flex-direction: column; gap: 0.4rem; }
-
-label { font-weight: bold; color: var(--darkPurple); font-size: 0.9rem; }
-.opcional { font-weight: normal; color: #888; }
-small { color: #666; }
-
-input, select, textarea {
-    padding: 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    font-family: inherit;
-    background: white;
-}
-
-input:focus, textarea:focus, select:focus {
-    outline: 2px solid var(--pink);
-    border-color: transparent;
-}
-
-.full-width { width: 100%; padding: 0.9rem; font-size: 1rem; }
-
-.error { color: red; font-weight: bold; text-align: center; }
 </style>

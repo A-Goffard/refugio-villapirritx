@@ -8,9 +8,13 @@ from django.test import override_settings
 from PIL import Image
 from rest_framework.test import APITestCase
 
-from .models import Animal, Solicitud
+from .models import Animal, Evento, Solicitud
 
 MEDIA_TEMPORAL = tempfile.mkdtemp()
+
+
+def tearDownModule():
+    shutil.rmtree(MEDIA_TEMPORAL, ignore_errors=True)
 
 
 def foto_de_prueba(ancho=3000, alto=2000):
@@ -48,11 +52,6 @@ class SolicitudPermisosTests(APITestCase):
 
 @override_settings(MEDIA_ROOT=MEDIA_TEMPORAL)
 class AnimalGestionTests(APITestCase):
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        shutil.rmtree(MEDIA_TEMPORAL, ignore_errors=True)
-
     def setUp(self):
         self.staff = User.objects.create_user('refugio', password='clave-segura-123', is_staff=True)
         self.animal = Animal.objects.create(nombre='Txuri', descripcion='Muy cariñosa')
@@ -124,3 +123,33 @@ class FlujoNavegadorTests(APITestCase):
         self.assertEqual(self.client.patch(url, {'estado': 'ADOPTADO'}).status_code, 403)
         self.assertEqual(self.client.patch(url, {'estado': 'ADOPTADO'}, HTTP_X_CSRFTOKEN=token).status_code, 200)
         self.assertEqual(self.client.post('/api/auth/logout/', HTTP_X_CSRFTOKEN=token).status_code, 200)
+
+
+@override_settings(MEDIA_ROOT=MEDIA_TEMPORAL)
+class EventoGestionTests(APITestCase):
+    def setUp(self):
+        self.staff = User.objects.create_user('refugio', password='x', is_staff=True)
+        self.datos = {'titulo': 'Mercadillo solidario', 'fecha': '2026-12-12', 'horario': 'De 11:00 a 14:00',
+                      'lugar': 'Plaza de Sondika', 'descripcion': 'Venta de bitxis para el refugio'}
+
+    def test_publico_puede_ver_pero_no_crear(self):
+        self.assertEqual(self.client.get('/api/eventos/').status_code, 200)
+        self.assertEqual(self.client.post('/api/eventos/', self.datos).status_code, 403)
+
+    def test_staff_crea_evento_sin_imagen(self):
+        self.client.force_authenticate(self.staff)
+        respuesta = self.client.post('/api/eventos/', self.datos, format='multipart')
+        self.assertEqual(respuesta.status_code, 201)
+        self.assertIsNone(respuesta.data['imagen'])
+
+    def test_quitar_imagen_borra_el_archivo(self):
+        self.client.force_authenticate(self.staff)
+        creado = self.client.post('/api/eventos/', {**self.datos, 'imagen': foto_de_prueba(1000, 1500)}, format='multipart')
+        evento = Evento.objects.get(id=creado.data['id'])
+        archivo = evento.imagen.name
+        self.assertTrue(evento.imagen.storage.exists(archivo))
+
+        respuesta = self.client.patch(f'/api/eventos/{evento.id}/', {'imagen': ''}, format='multipart')
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertIsNone(respuesta.data['imagen'])
+        self.assertFalse(evento.imagen.storage.exists(archivo))

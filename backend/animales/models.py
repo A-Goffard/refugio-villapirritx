@@ -43,3 +43,18 @@ class Solicitud(models.Model):
     
     class Meta:
         verbose_name_plural = "Solicitudes y Contacto"
+
+class Evento(models.Model):
+    titulo = models.CharField(max_length=100)
+    fecha = models.DateField()
+    horario = models.CharField(max_length=100, help_text="Ej: De 11:00 a 14:00")
+    lugar = models.CharField(max_length=150)
+    descripcion = models.TextField(max_length=600, verbose_name="Descripción breve")
+    imagen = models.ImageField(upload_to='eventos/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.titulo} ({self.fecha})"
+
+    class Meta:
+        ordering = ['fecha']

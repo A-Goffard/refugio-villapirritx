@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Animal
+from .models import Animal, Evento
 from .models import Solicitud
 from .imagenes import optimizar_imagen
 
@@ -14,6 +14,17 @@ class AnimalSerializer(serializers.ModelSerializer):
         if foto:
             return optimizar_imagen(foto)
         return foto
+
+class EventoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Evento
+        fields = '__all__'
+        read_only_fields = ['created_at']
+
+    def validate_imagen(self, imagen):
+        if imagen:
+            return optimizar_imagen(imagen)
+        return imagen
 
 class SolicitudSerializer(serializers.ModelSerializer):
     class Meta:
