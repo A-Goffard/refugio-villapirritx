@@ -2,6 +2,7 @@
 // 1. AÑADIR 'onUnmounted' AQUÍ ARRIBA
 import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
+import { hacerUrlSegura } from '@/utils/urls'
 
 // --- DATOS ---
 const animales = ref([])
@@ -27,22 +28,6 @@ const cerrarModal = () => {
 onUnmounted(() => {
     document.body.style.overflow = 'auto'
 })
-
-const hacerUrlSegura = (url) => {
-    if (!url) return null; 
-    
-    // Excepción local
-    if (url.includes('127.0.0.1') || url.includes('localhost')) {
-        return url;
-    }
-
-    // Corrección HTTPS para la web
-    if (url.startsWith('http://')) {
-        return url.replace('http://', 'https://');
-    }
-    
-    return url;
-}
 
 // --- CARGA ---
 onMounted(async () => {

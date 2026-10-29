@@ -1,15 +1,69 @@
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAdminUser, BasePermission, SAFE_METHODS
+from django.contrib.auth import authenticate, login, logout
 from django.core.mail import send_mail
 from django.conf import settings
+from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import Animal, Solicitud
 from .serializers import AnimalSerializer, SolicitudSerializer
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-class AnimalViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Animal.objects.all()
+
+class EsStaffOSoloLectura(BasePermission):
+    """Todo el mundo puede ver; solo el equipo del refugio puede cambiar cosas."""
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS or request.user.is_staff
+
+
+class AnimalViewSet(viewsets.ModelViewSet):
+    queryset = Animal.objects.order_by('-created_at')
     serializer_class = AnimalSerializer
+    permission_classes = [EsStaffOSoloLectura]
+
+    # Al cambiar o borrar un animal, quitamos su foto vieja del disco
+    def perform_update(self, serializer):
+        foto_anterior = serializer.instance.foto.name
+        animal = serializer.save()
+        if foto_anterior and foto_anterior != animal.foto.name:
+            animal.foto.storage.delete(foto_anterior)
+
+    def perform_destroy(self, instance):
+        if instance.foto:
+            instance.foto.storage.delete(instance.foto.name)
+        instance.delete()
+
+
+# --- SESIÓN PARA EL PANEL DE GESTIÓN ---
+@ensure_csrf_cookie
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def sesion(request):
+    # Además de decir quién está conectado, deja la cookie CSRF para los POST
+    if request.user.is_staff:
+        return Response({'usuario': request.user.get_username()})
+    return Response({'usuario': None})
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def iniciar_sesion(request):
+    usuario = authenticate(
+        request,
+        username=request.data.get('usuario'),
+        password=request.data.get('contrasena'),
+    )
+    if usuario is None or not usuario.is_staff:
+        return Response({'error': 'Usuario o contraseña incorrectos'}, status=400)
+    login(request, usuario)
+    return Response({'usuario': usuario.get_username()})
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def cerrar_sesion(request):
+    logout(request)
+    return Response({'usuario': None})
 
 # --- NUEVA VISTA PARA SOLICITUDES ---
 class SolicitudViewSet(viewsets.ModelViewSet):

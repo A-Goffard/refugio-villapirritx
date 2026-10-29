@@ -10,9 +10,10 @@ import EventosView from "@/views/EventosView.vue";
 import ContactoView from "@/views/ContactoView.vue";
 import FormularioView from "@/views/FormularioView.vue";
 // import InteresView from "@/views/InteresView.vue";
-import SubidaView from "@/views/SubidaView.vue";
-import GestionAdopcionesView from "@/views/GestionAdopcionesView.vue";
 import SolicitudAdopcion from "../views/SolicitudAdopcion.vue";
+import LoginView from "@/views/LoginView.vue";
+import GestionView from "@/views/GestionView.vue";
+import { useAuthStore } from "@/stores/auth";
 
 // NOTA: No hace falta importar Header y Footer aquí,
 // porque ya están puestos fijos en App.vue.
@@ -44,13 +45,16 @@ const router = createRouter({
     // { path: "/interes", name: "interes", component: InteresView },
     { path: "/formulario", name: "formulario", component: FormularioView },
 
-    // Rutas admin
-    { path: "/subida", name: "subida", component: SubidaView },
+    // Rutas del panel del refugio
+    { path: "/acceso", name: "acceso", component: LoginView },
     {
-      path: "/gestion-adopciones",
+      path: "/gestion",
       name: "gestion",
-      component: GestionAdopcionesView,
+      component: GestionView,
+      meta: { requiereLogin: true },
     },
+    { path: "/subida", redirect: "/gestion" },
+    { path: "/gestion-adopciones", redirect: "/gestion" },
     {
       path: "/solicitud",
       name: "solicitud",
@@ -60,6 +64,14 @@ const router = createRouter({
     // Comodín
     { path: "/:pathMatch(.*)*", redirect: "/" },
   ],
+});
+
+// Las páginas del panel solo se ven con la sesión iniciada
+router.beforeEach(async (to) => {
+  if (!to.meta.requiereLogin) return true;
+  const auth = useAuthStore();
+  if (await auth.comprobarSesion()) return true;
+  return { name: "acceso", query: { siguiente: to.fullPath } };
 });
 
 export default router;
