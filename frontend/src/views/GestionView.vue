@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore, esSesionCaducada } from '@/stores/auth'
 import { hacerUrlSegura } from '@/utils/urls'
 import AnimalFormulario from '@/components/gestion/AnimalFormulario.vue'
 import { ESTADOS } from '@/components/gestion/estados'
@@ -80,7 +80,7 @@ const cambiarEstado = async (animal, estado) => {
         await axios.patch(`/api/animales/${animal.id}/`, { estado })
     } catch (e) {
         animal.estado = anterior
-        if (e.response?.status === 403) return sesionCaducada()
+        if (esSesionCaducada(e)) return sesionCaducada()
         alert('No se ha podido cambiar el estado. Inténtalo de nuevo.')
     }
 }
@@ -91,7 +91,7 @@ const borrar = async (animal) => {
         await axios.delete(`/api/animales/${animal.id}/`)
         animales.value = animales.value.filter((a) => a.id !== animal.id)
     } catch (e) {
-        if (e.response?.status === 403) return sesionCaducada()
+        if (esSesionCaducada(e)) return sesionCaducada()
         alert('No se ha podido borrar. Inténtalo de nuevo.')
     }
 }

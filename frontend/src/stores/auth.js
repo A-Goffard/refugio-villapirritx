@@ -2,6 +2,11 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
+// Un 403 puede ser sesión caducada o un fallo de CSRF (configuración del servidor):
+// solo lo primero debe mandar a la pantalla de login
+export const esSesionCaducada = (error) =>
+  error.response?.status === 403 && !error.response.data?.detail?.startsWith('CSRF')
+
 export const useAuthStore = defineStore('auth', () => {
   const usuario = ref(null)
   const comprobado = ref(false)

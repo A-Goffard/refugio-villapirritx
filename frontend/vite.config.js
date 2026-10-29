@@ -19,11 +19,12 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8000', // Tu Django local
-        changeOrigin: true,
+        // false: Django tiene que ver el Host real (localhost:5173) o rechaza los POST por CSRF
+        changeOrigin: false,
       },
       '/media': {
         target: 'http://127.0.0.1:8000', // Para las fotos
-        changeOrigin: true,
+        changeOrigin: false,
       }
     }
   }

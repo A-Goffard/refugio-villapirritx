@@ -4,6 +4,7 @@ import axios from 'axios'
 import { hacerUrlSegura } from '@/utils/urls'
 import { reducirImagen } from '@/utils/imagenes'
 import { ESTADOS } from './estados'
+import { esSesionCaducada } from '@/stores/auth'
 
 // Si recibe un animal, lo edita; si no, crea uno nuevo
 const props = defineProps({
@@ -54,7 +55,7 @@ const guardar = async () => {
         emit('guardado', data)
     } catch (e) {
         console.error(e)
-        if (e.response?.status === 403) {
+        if (esSesionCaducada(e)) {
             emit('sesion-caducada')
         } else if (e.response?.status === 413) {
             errorMsg.value = 'La foto es demasiado grande. Prueba con otra.'
