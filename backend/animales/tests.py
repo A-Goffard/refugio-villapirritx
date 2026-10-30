@@ -39,6 +39,9 @@ class SolicitudPermisosTests(APITestCase):
         respuesta = self.client.post(self.url_lista, datos)
         self.assertEqual(respuesta.status_code, 201)
         self.assertFalse(Solicitud.objects.get(nombre='Jon').gestionada)
+        # Aviso al refugio; al responder, le llega a quien escribió
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].reply_to, ['jon@example.com'])
 
     def test_publico_no_puede_leer_ni_borrar(self):
         self.assertEqual(self.client.get(self.url_lista).status_code, 403)

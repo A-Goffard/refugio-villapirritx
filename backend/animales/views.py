@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAdminUser, BasePermission, SAFE_METHODS
 from django.contrib.auth import authenticate, login, logout
-from django.core.mail import send_mail, EmailMessage
+from django.core.mail import EmailMessage
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils.text import slugify
@@ -115,19 +115,20 @@ class SolicitudViewSet(viewsets.ModelViewSet):
         Mensaje:
         {solicitud.mensaje}
         
-        Entrad al panel de administración para gestionarla.
+        Si respondéis a este correo, le llegará directamente a {solicitud.nombre}.
         """
-        
+
+        # La solicitud ya está guardada: si el correo falla, queda en el log y en el panel
         try:
-            send_mail(
+            EmailMessage(
                 asunto,
                 mensaje,
                 settings.DEFAULT_FROM_EMAIL, # Remitente
                 [settings.DEFAULT_FROM_EMAIL], # Destinatario (el refugio)
-                fail_silently=True,
-            )
+                reply_to=[solicitud.email],
+            ).send(fail_silently=False)
         except Exception as e:
-            print(f"Error enviando email: {e}")
+            print(f"Error enviando email de la solicitud {solicitud.id}: {e}")
             
             
 # --- CUESTIONARIO PRE-ADOPCIÓN ---
