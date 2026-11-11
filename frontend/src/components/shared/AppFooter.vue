@@ -51,6 +51,9 @@ const currentYear = new Date().getFullYear()
 
     <div class="footer-bottom">
       <p>© {{ currentYear }} Asociación Protectora de Animales Villa Pirritx. Todos los derechos reservados.</p>
+      <p>By <a class="footer-link-Geobizi" href="https://www.geobizi.com" target="_blank"
+            rel="noopener noreferrer">Geobizi&lt;TIK&gt;<img class="logo-geobizi" src="/iconos/Hojitas.png"
+              alt="Hojitas"></a></p>
     </div>
   </footer>
 </template>
@@ -162,7 +165,15 @@ const currentYear = new Date().getFullYear()
   font-size: 0.85rem;
   color: #ccc;
 }
-
+.footer-link-Geobizi {
+  display: inline-flex;
+  color: var(--darkgreen);
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.logo-geobizi {
+  height: 17px;
+}
 /* Responsive */
 @media (max-width: 564px) {
   .footer-content {
