@@ -35,7 +35,7 @@ const compartirWeb = async () => {
     <div class="capaBlanca">
         <div class="centre cardLogo">
             <img class="logo" src="/logos/logo.png" alt="logo">
-            <h2>VILLA PIRRITIX</h2>
+            <h2>VILLA PIRRITX</h2>
         </div>
 
         <div class="centre card2">
@@ -92,40 +92,53 @@ const compartirWeb = async () => {
 
     <div class="capaBlanca">
         <div class="centre cardLogo">
-            <img class="logo" src="/mix/voluntarios.png" alt="voluntariado">
+            <img class="logo" src="/mix/logo_Yako_transparente.png" alt="Yako Happy">
         </div>
 
         <div class="centre card2">
-            <p class="textCentre"><b>Voluntariado</b></p>
-            <p class="textCentre">Ser voluntario en la protectora es una oportunidad para marcar la diferencia. Con tu tiempo y dedicación, ayudas en su cuidado y les das el cariño que tanto necesitan.</p>
-            
-            <RouterLink :to="{ path: '/formulario', query: { tipo: 'VOLUNTARIADO' }}">
-                <button class="btnRosa">¡Me apunto!</button>
-            </RouterLink>
+            <p class="textCentre"><b>Compra para tu perro y ayuda a Villa Pirritx</b></p>
+            <p class="textCentre">Por cada compra que hagas en la tienda de Yako Happy desde este enlace, donan 1&nbsp;€ a la protectora. A ti no te cuesta nada más, y a ellos les ayuda muchísimo.</p>
+
+            <!-- El enlace tiene que llevar los utm_ para que Yako Happy cuente la compra para el refugio -->
+            <a href="https://yakohappy.store/?utm_source=villapirritx&utm_medium=referral&utm_campaign=protectoras"
+                target="_blank" rel="noopener sponsored">
+                <button class="btnRosa">Ir a la tienda</button>
+            </a>
         </div>
     </div>
 
     <div class="capaRosa">
+        <div class="centre card2">
+            <p class="textCentre"><b>Voluntariado</b></p>
+            <p class="textCentre">Ser voluntario en la protectora es una oportunidad para marcar la diferencia. Con tu tiempo y dedicación, ayudas en su cuidado y les das el cariño que tanto necesitan.</p>
+
+            <RouterLink :to="{ path: '/formulario', query: { tipo: 'VOLUNTARIADO' }}">
+                <button class="btnMorado">¡Me apunto!</button>
+            </RouterLink>
+        </div>
+
+        <div class="centre cardLogo">
+            <img class="logo" src="/mix/voluntarios.png" alt="voluntariado">
+        </div>
+    </div>
+
+    <div class="capaBlanca">
+        <div class="centre cardLogo">
+            <img class="logo" src="/mix/viaje.png" alt="viajes">
+        </div>
+
         <div class="centre card2">
             <p class="textCentre"><b>Viajes solidarios</b></p>
             <p class="textCentre">Los viajes solidarios son clave. Transportar perros y gatos a otras ciudades o países donde serán adoptados es una misión llena de esperanza. Al participar, ayudas a que los animales lleguen seguros a su nuevo hogar.</p>
 
 
             <RouterLink :to="{ path: '/formulario', query: { tipo: 'VIAJE' }}">
-    <button class="btnMorado">¡Me apunto!</button>
+    <button class="btnRosa">¡Me apunto!</button>
 </RouterLink>
-        </div>
-
-        <div class="centre cardLogo">
-            <img class="logo" src="/mix/viaje.png" alt="viajes">
         </div>
     </div>
 
-    <div class="capaBlanca">
-        <div class="centre cardLogo">
-            <img class="logo" src="/mix/difunde.png" alt="difunde">
-        </div>
-
+    <div class="capaRosa">
         <div class="centre card2">
             <p class="textCentre"><b>Difunde</b></p>
             <p class="textCentre">Difundir en redes o de manera verbal es una de las formas más poderosas de ayudar. Compartiendo publicaciones puedes conectar a nuestros peludos con personas dispuestas a adoptar.</p>
@@ -154,6 +167,10 @@ const compartirWeb = async () => {
 
 
         </div>
+
+        <div class="centre cardLogo">
+            <img class="logo" src="/mix/difunde.png" alt="difunde">
+        </div>
     </div>
 
   </div>
@@ -162,9 +179,17 @@ const compartirWeb = async () => {
 <style scoped>
 /* Estilos específicos para esta vista */
 
+/* Foto y texto juntos en el centro: con space-evenly (main.css) se separaban
+   mucho en pantallas grandes */
+.capaBlanca, .capaRosa {
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+}
+
 .cardLogo {
     /* Ajuste para que las imágenes no sean gigantes */
-    width: 100%;
+    flex: 0 1 300px;
     padding: 1rem;
 }
 
@@ -176,8 +201,7 @@ const compartirWeb = async () => {
 
 .card2 {
     /* Ajuste para los textos */
-    width: 100%;
-    max-width: 40rem;
+    flex: 0 1 40rem;
     padding: 1rem;
 }
 
@@ -188,15 +212,17 @@ const compartirWeb = async () => {
         flex-direction: column;
         padding: 2rem 1rem;
         text-align: center;
+        align-items: stretch;
+        gap: 0;
     }
 
-    /* Pequeño truco para el orden en móvil:
-       Si quieres que la foto salga siempre arriba o abajo, se puede usar 'order',
-       pero por defecto se apilarán según el HTML.
-    */
-    
+    /* En móvil la foto siempre encima del texto, aunque en el HTML vaya detrás */
     .cardLogo {
+        order: -1;
+        flex-basis: auto;
         margin-bottom: 1rem;
     }
+
+    .card2 { flex-basis: auto; }
 }
 </style>
