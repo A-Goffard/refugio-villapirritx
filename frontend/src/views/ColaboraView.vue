@@ -92,9 +92,34 @@ const compartirWeb = async () => {
 
     <div class="capaBlanca">
         <div class="centre cardLogo">
-            <img class="logo" src="/mix/logo_Yako_transparente.png" alt="Yako Happy">
+            <img class="logo" src="/mix/mano-pata.jpg" alt="Una mano sujetando la pata de un perro sobre la hierba">
         </div>
 
+        <div class="centre card2">
+            <p class="textCentre"><b>Haz un donativo online</b></p>
+            <p class="textCentre">Si no puedes acercarte al refugio, también puedes echarnos una pata desde casa con un donativo. Todo lo que recaudamos se destina a la comida, los tratamientos veterinarios y los cuidados de los animales.</p>
+
+            <div class="opciones-online">
+                <div class="opcion-online">
+                    <p><b>Teaming</b></p>
+                    <p>Únete a nuestro grupo con 1&nbsp;€ al mes. Poco para ti y, entre todos, mucho para ellos.</p>
+                    <a href="https://www.teaming.net/villapirritxanimaliak" target="_blank" rel="noopener">
+                        <button class="btnMorado">Unirme en Teaming</button>
+                    </a>
+                </div>
+
+                <div class="opcion-online">
+                    <p><b>Coral</b></p>
+                    <p>Haz tu donación a través de Coral, una plataforma de recaudación sin comisiones de plataforma.</p>
+                    <a href="https://coral.to/c/villa-pirritx-animaliak" target="_blank" rel="noopener">
+                        <button class="btnMorado">Donar en Coral</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="capaRosa">
         <div class="centre card2">
             <p class="textCentre"><b>Compra para tu perro y ayuda a Villa Pirritx</b></p>
             <p class="textCentre">Por cada compra que hagas en la tienda de Yako Happy desde este enlace, donan 1&nbsp;€ a la protectora. A ti no te cuesta nada más, y a ellos les ayuda muchísimo.</p>
@@ -102,74 +127,75 @@ const compartirWeb = async () => {
             <!-- El enlace tiene que llevar los utm_ para que Yako Happy cuente la compra para el refugio -->
             <a href="https://yakohappy.store/?utm_source=villapirritx&utm_medium=referral&utm_campaign=protectoras"
                 target="_blank" rel="noopener sponsored">
-                <button class="btnRosa">Ir a la tienda</button>
+                <button class="btnMorado">Ir a la tienda</button>
             </a>
-        </div>
-    </div>
-
-    <div class="capaRosa">
-        <div class="centre card2">
-            <p class="textCentre"><b>Voluntariado</b></p>
-            <p class="textCentre">Ser voluntario en la protectora es una oportunidad para marcar la diferencia. Con tu tiempo y dedicación, ayudas en su cuidado y les das el cariño que tanto necesitan.</p>
-
-            <RouterLink :to="{ path: '/formulario', query: { tipo: 'VOLUNTARIADO' }}">
-                <button class="btnMorado">¡Me apunto!</button>
-            </RouterLink>
         </div>
 
         <div class="centre cardLogo">
-            <img class="logo" src="/mix/voluntarios.png" alt="voluntariado">
+            <img class="logo" src="/mix/logo_Yako_transparente.png" alt="Yako Happy">
         </div>
     </div>
 
     <div class="capaBlanca">
         <div class="centre cardLogo">
-            <img class="logo" src="/mix/viaje.png" alt="viajes">
+            <img class="logo" src="/mix/voluntarios.png" alt="voluntariado">
         </div>
 
         <div class="centre card2">
-            <p class="textCentre"><b>Viajes solidarios</b></p>
-            <p class="textCentre">Los viajes solidarios son clave. Transportar perros y gatos a otras ciudades o países donde serán adoptados es una misión llena de esperanza. Al participar, ayudas a que los animales lleguen seguros a su nuevo hogar.</p>
+            <p class="textCentre"><b>Voluntariado</b></p>
+            <p class="textCentre">Ser voluntario en la protectora es una oportunidad para marcar la diferencia. Con tu tiempo y dedicación, ayudas en su cuidado y les das el cariño que tanto necesitan.</p>
 
-
-            <RouterLink :to="{ path: '/formulario', query: { tipo: 'VIAJE' }}">
-    <button class="btnRosa">¡Me apunto!</button>
-</RouterLink>
+            <RouterLink :to="{ path: '/formulario', query: { tipo: 'VOLUNTARIADO' }}">
+                <button class="btnRosa">¡Me apunto!</button>
+            </RouterLink>
         </div>
     </div>
 
     <div class="capaRosa">
         <div class="centre card2">
-            <p class="textCentre"><b>Difunde</b></p>
-            <p class="textCentre">Difundir en redes o de manera verbal es una de las formas más poderosas de ayudar. Compartiendo publicaciones puedes conectar a nuestros peludos con personas dispuestas a adoptar.</p>
-            <p class="textCentre">Síguenos en redes o comparte nuestra página:</p>
-                        <br>
-                                    <div class="social-media">
+            <p class="textCentre"><b>Viajes solidarios</b></p>
+            <p class="textCentre">Los viajes solidarios son clave. Transportar perros y gatos a otras ciudades o países donde serán adoptados es una misión llena de esperanza. Al participar, ayudas a que los animales lleguen seguros a su nuevo hogar.</p>
 
-                            <a href="https://www.facebook.com/profile.php?id=100068535188856&locale=es_ES"
-                                target="_blank" title="Villapirritx en Facebook">
-                                <img src="/iconos/bn/facebook.png" alt="Facebook" class="social-icon" title="Facebook"
-                                    loading="lazy" />
-                            </a>
-
-                            <a href="https://www.instagram.com/villapirritxanimaliak/" target="_blank"
-                                title="Villapirritx en Instagram">
-                                <img src="/iconos/bn/instagram.png" alt="Instagram" class="social-icon"
-                                    title="Instagram" loading="lazy" />
-                            </a>
-
-                            <a @click="compartirWeb" class="btn-share" title="Compartir esta página">
-                                <img src="/iconos/bn/compartir.png" alt="Compartir" class="social-icon"
-                                    title="Compartir" loading="lazy" />
-                            </a>
-
-                        </div>
-
-
+            <RouterLink :to="{ path: '/formulario', query: { tipo: 'VIAJE' }}">
+                <button class="btnMorado">¡Me apunto!</button>
+            </RouterLink>
         </div>
 
         <div class="centre cardLogo">
+            <img class="logo" src="/mix/viaje.png" alt="viajes">
+        </div>
+    </div>
+
+    <div class="capaBlanca">
+        <div class="centre cardLogo">
             <img class="logo" src="/mix/difunde.png" alt="difunde">
+        </div>
+
+        <div class="centre card2">
+            <p class="textCentre"><b>Difunde</b></p>
+            <p class="textCentre">Difundir en redes o de manera verbal es una de las formas más poderosas de ayudar. Compartiendo publicaciones puedes conectar a nuestros peludos con personas dispuestas a adoptar.</p>
+            <p class="textCentre">Síguenos en redes o comparte nuestra página:</p>
+            <br>
+            <div class="social-media">
+
+                <a href="https://www.facebook.com/profile.php?id=100068535188856&locale=es_ES"
+                    target="_blank" title="Villapirritx en Facebook">
+                    <img src="/iconos/bn/facebook.png" alt="Facebook" class="social-icon" title="Facebook"
+                        loading="lazy" />
+                </a>
+
+                <a href="https://www.instagram.com/villapirritxanimaliak/" target="_blank"
+                    title="Villapirritx en Instagram">
+                    <img src="/iconos/bn/instagram.png" alt="Instagram" class="social-icon"
+                        title="Instagram" loading="lazy" />
+                </a>
+
+                <a @click="compartirWeb" class="btn-share" title="Compartir esta página">
+                    <img src="/iconos/bn/compartir.png" alt="Compartir" class="social-icon"
+                        title="Compartir" loading="lazy" />
+                </a>
+
+            </div>
         </div>
     </div>
 
@@ -204,6 +230,28 @@ const compartirWeb = async () => {
     flex: 0 1 40rem;
     padding: 1rem;
 }
+
+/* Bloque "Haz un donativo online": Teaming y Coral */
+.opciones-online {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    width: 100%;
+}
+
+.opcion-online {
+    flex: 1 1 12rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 1rem;
+    background: var(--lightPink);
+}
+
+.opcion-online p:last-of-type { flex: 1; } /* botones alineados abajo */
 
 /* RESPONSIVE: MÓVIL */
 @media (max-width: 768px) {
