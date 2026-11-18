@@ -1,3 +1,10 @@
+# Registros de los contenedores: como máximo 3 archivos de 10 MB (sin esto, Docker los guarda sin límite)
+x-registros: &registros
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   # --- BACKEND (Django) ---
   backend:
@@ -5,6 +12,7 @@ services:
       container_name: refugio_backend
       restart: always
       command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+      logging: *registros
       volumes:
         - media_volume:/app/media
         - ./backend/db.sqlite3:/app/db.sqlite3
@@ -21,6 +29,7 @@ services:
     build: ./frontend
     container_name: refugio_frontend
     restart: always
+    logging: *registros
     ports:
       - "8082:80" 
     depends_on:
