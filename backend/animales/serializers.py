@@ -32,11 +32,22 @@ class EventoSerializer(serializers.ModelSerializer):
         return imagen
 
 class SolicitudSerializer(serializers.ModelSerializer):
+    acepta_privacidad = serializers.BooleanField(write_only=True)
+
     class Meta:
         model = Solicitud
         fields = '__all__'
         # Que nadie pueda marcarla como gestionada desde el formulario público
         read_only_fields = ['gestionada', 'fecha']
+
+    def validate_acepta_privacidad(self, acepta):
+        if not acepta:
+            raise serializers.ValidationError('Tienes que aceptar la política de privacidad para enviar el formulario.')
+        return acepta
+
+    def create(self, datos):
+        datos.pop('acepta_privacidad')
+        return super().create(datos)
 
 class SolicitudAdopcionSerializer(serializers.ModelSerializer):
     """Formulario público: solo se envían el animal, las respuestas y la aceptación de privacidad."""

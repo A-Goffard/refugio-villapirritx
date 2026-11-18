@@ -1,8 +1,11 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
+
+// El mapa de Google solo se carga al pulsar el botón (instala cookies de Google)
+const mostrarMapa = ref(false)
 </script>
 
 <template>
@@ -75,12 +78,20 @@ const route = useRoute()
                 <p>Nos encontramos en el entorno de Sondika.</p>
             </div>
 
+            <!-- El mapa de Google instala cookies de terceros: solo se carga si la persona lo pide -->
             <div class="map-container">
-                <iframe
+                <iframe v-if="mostrarMapa"
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d23225.59267156321!2d-2.946377767858886!3d43.29748687913508!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd4e50507d77ce09%3A0x6d9575452d242699!2sSondika%2C%20Biscay!5e0!3m2!1sen!2ses!4v1700000000000!5m2!1sen!2ses"
                     width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"
                     referrerpolicy="no-referrer-when-downgrade">
                 </iframe>
+                <div v-else class="mapa-aviso">
+                    <p>El mapa es de Google Maps. Al mostrarlo, Google puede guardar cookies en tu navegador
+                        (<RouterLink to="/cookies">más información</RouterLink>).</p>
+                    <button class="btnMorado" @click="mostrarMapa = true">Mostrar mapa</button>
+                    <a href="https://www.google.com/maps/search/?api=1&query=Sondika%2C%20Bizkaia" target="_blank"
+                        rel="noopener">o ábrelo en Google Maps</a>
+                </div>
             </div>
         </div>
 
@@ -135,6 +146,20 @@ const route = useRoute()
 }
 
 /* Contenedor del mapa */
+.mapa-aviso {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    background: var(--lightPurple);
+}
+
+.mapa-aviso a { color: var(--darkPurple); text-decoration: underline; }
+
 .map-container {
     width: 100%;
     max-width: 1000px;

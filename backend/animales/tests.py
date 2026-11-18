@@ -35,13 +35,24 @@ class SolicitudPermisosTests(APITestCase):
 
     def test_publico_puede_crear(self):
         datos = {'tipo': 'VOLUNTARIADO', 'nombre': 'Jon', 'email': 'jon@example.com',
-                 'telefono': '611111111', 'gestionada': True}
+                 'telefono': '611111111', 'gestionada': True, 'acepta_privacidad': True}
         respuesta = self.client.post(self.url_lista, datos)
         self.assertEqual(respuesta.status_code, 201)
         self.assertFalse(Solicitud.objects.get(nombre='Jon').gestionada)
         # Aviso al refugio; al responder, le llega a quien escribió
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].reply_to, ['jon@example.com'])
+
+    def test_sin_aceptar_privacidad_no_se_guarda(self):
+        datos = {'tipo': 'OTRO', 'nombre': 'Miren', 'email': 'miren@example.com', 'telefono': '622222222'}
+        self.assertEqual(self.client.post(self.url_lista, datos).status_code, 400)
+        self.assertEqual(self.client.post(self.url_lista, {**datos, 'acepta_privacidad': False}).status_code, 400)
+        self.assertFalse(Solicitud.objects.filter(nombre='Miren').exists())
+
+    def test_boton_apadrina_de_colabora(self):
+        datos = {'tipo': 'APADRINA', 'nombre': 'Unai', 'email': 'unai@example.com', 'telefono': '633333333',
+                 'acepta_privacidad': True}
+        self.assertEqual(self.client.post(self.url_lista, datos).status_code, 201)
 
     def test_publico_no_puede_leer_ni_borrar(self):
         self.assertEqual(self.client.get(self.url_lista).status_code, 403)

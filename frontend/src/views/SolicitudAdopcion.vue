@@ -117,8 +117,9 @@ const enviarFormulario = async () => {
           <label class="privacidad">
             <input type="checkbox" v-model="aceptaPrivacidad" required />
             <span>
-              Acepto que el Refugio Villa Pirritx guarde estos datos para gestionar la adopción. No se cederán
-              a nadie más y puedo pedir que se borren escribiendo a villapirritxanimaliak@gmail.com. *
+              He leído la <RouterLink to="/privacidad" target="_blank">política de privacidad</RouterLink> y acepto
+              que la asociación use estos datos, incluido el dato sobre alergias, para valorar y gestionar la
+              adopción. Puedo pedir que se borren escribiendo a villapirritxanimaliak@gmail.com. *
             </span>
           </label>
 
@@ -174,6 +175,7 @@ input:focus, textarea:focus { border-color: var(--lightPurple); outline: none; }
 
 .privacidad { display: flex; gap: 0.7rem; align-items: flex-start; font-weight: normal; color: #444; }
 .privacidad input { width: auto; margin-top: 0.25rem; flex-shrink: 0; }
+.privacidad a { color: var(--pink); text-decoration: underline; }
 .despedida { color: #666; font-style: italic; margin: 1.5rem 0; }
 
 .btnRosa { width: 100%; margin-top: 1rem; }

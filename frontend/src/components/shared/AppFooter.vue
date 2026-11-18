@@ -1,5 +1,6 @@
 <script setup>
 import { RouterLink } from 'vue-router'
+import { ASOCIACION } from '@/datosLegales'
 
 // Obtenemos el año actual automáticamente para el copyright
 const currentYear = new Date().getFullYear()
@@ -50,7 +51,12 @@ const currentYear = new Date().getFullYear()
     </div>
 
     <div class="footer-bottom">
-      <p>© {{ currentYear }} Asociación Protectora de Animales Villa Pirritx. Todos los derechos reservados.</p>
+      <p>© {{ currentYear }} {{ ASOCIACION.nombre }}. Todos los derechos reservados.</p>
+      <p class="enlaces-legales">
+        <RouterLink to="/aviso-legal">Aviso legal</RouterLink> ·
+        <RouterLink to="/privacidad">Privacidad</RouterLink> ·
+        <RouterLink to="/cookies">Cookies</RouterLink>
+      </p>
       <p>By <a class="footer-link-Geobizi" href="https://www.geobizi.com" target="_blank"
             rel="noopener noreferrer">Geobizi&lt;TIK&gt;<img class="logo-geobizi" src="/iconos/Hojitas.png"
               alt="Hojitas"></a></p>
@@ -165,6 +171,10 @@ const currentYear = new Date().getFullYear()
   font-size: 0.85rem;
   color: #ccc;
 }
+.enlaces-legales { margin: 0.4rem 0; }
+.enlaces-legales a { color: #ccc; text-decoration: underline; }
+.enlaces-legales a:hover { color: var(--white); }
+
 .footer-link-Geobizi {
   display: inline-flex;
   color: var(--darkgreen);

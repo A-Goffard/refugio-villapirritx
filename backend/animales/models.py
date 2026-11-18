@@ -28,6 +28,7 @@ class Solicitud(models.Model):
     TIPOS = [
         ('ACOGIDA', 'Casa de Acogida'),
         ('ADOPCION', 'Adopción'),
+        ('APADRINA', 'Apadrinamiento'),
         ('VOLUNTARIADO', 'Voluntariado'),
         ('DONACION', 'Donación Material'),
         ('VIAJE', 'Viaje Solidario'),

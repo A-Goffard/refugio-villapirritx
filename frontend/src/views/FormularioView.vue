@@ -12,7 +12,8 @@ const form = ref({
     nombre: '',
     email: '',
     telefono: '',
-    mensaje: ''
+    mensaje: '',
+    acepta_privacidad: false
 })
 
 const loading = ref(false)
@@ -31,6 +32,7 @@ const titulos = {
     'ACOGIDA': 'Solicitud de Casa de Acogida',
     'VOLUNTARIADO': 'Solicitud de Voluntariado',
     'ADOPCION': 'Solicitud de Adopción',
+    'APADRINA': 'Apadrinamiento',
     'DONACION': 'Donación de Material',
     'VIAJE': 'Viaje Solidario',
     'OTRO': 'Contactar'
@@ -96,6 +98,7 @@ const enviarFormulario = async () => {
                     <select v-model="form.tipo">
                         <option value="ACOGIDA">Casa de Acogida</option>
                         <option value="ADOPCION">Adopción</option>
+                        <option value="APADRINA">Apadrinamiento</option>
                         <option value="VOLUNTARIADO">Voluntariado</option>
                         <option value="DONACION">Donación Material</option>
                         <option value="VIAJE">Viaje Solidario</option>
@@ -107,6 +110,14 @@ const enviarFormulario = async () => {
                     <label>Mensaje / Dudas</label>
                     <textarea v-model="form.mensaje" rows="5" placeholder="Cuéntanos un poco sobre ti..."></textarea>
                 </div>
+
+                <label class="privacidad">
+                    <input type="checkbox" v-model="form.acepta_privacidad" required>
+                    <span>
+                        He leído la <RouterLink to="/privacidad" target="_blank">política de privacidad</RouterLink> y
+                        acepto que la asociación use estos datos para responderme y gestionar mi solicitud. *
+                    </span>
+                </label>
 
                 <div v-if="errorMsg" class="error">{{ errorMsg }}</div>
 
@@ -175,4 +186,8 @@ input:focus, textarea:focus, select:focus {
 @keyframes bote { from { transform: translateY(0); } to { transform: translateY(-10px); } }
 
 .error { color: red; font-weight: bold; text-align: center; }
+
+.privacidad { display: flex; gap: 0.7rem; align-items: flex-start; font-weight: normal; color: #444; }
+.privacidad input { width: auto; margin-top: 0.25rem; flex-shrink: 0; }
+.privacidad a { color: var(--pink); text-decoration: underline; }
 </style>

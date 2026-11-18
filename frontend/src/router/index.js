@@ -12,6 +12,9 @@ import FormularioView from "@/views/FormularioView.vue";
 // import InteresView from "@/views/InteresView.vue";
 import SolicitudAdopcion from "../views/SolicitudAdopcion.vue";
 import LoginView from "@/views/LoginView.vue";
+import AvisoLegalView from "@/views/AvisoLegalView.vue";
+import PrivacidadView from "@/views/PrivacidadView.vue";
+import CookiesView from "@/views/CookiesView.vue";
 import GestionView from "@/views/GestionView.vue";
 import { useAuthStore } from "@/stores/auth";
 
@@ -44,6 +47,11 @@ const router = createRouter({
     { path: "/contacta", name: "contacto", component: ContactoView },
     // { path: "/interes", name: "interes", component: InteresView },
     { path: "/formulario", name: "formulario", component: FormularioView },
+
+    // Textos legales
+    { path: "/aviso-legal", name: "aviso-legal", component: AvisoLegalView },
+    { path: "/privacidad", name: "privacidad", component: PrivacidadView },
+    { path: "/cookies", name: "cookies", component: CookiesView },
 
     // Rutas del panel del refugio
     { path: "/acceso", name: "acceso", component: LoginView },
