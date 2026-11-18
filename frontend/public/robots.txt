@@ -1,0 +1,9 @@
+# Partes internas que no deben salir en los buscadores.
+# /api/ y /media/ NO se bloquean: Google las necesita para ver los animales y sus fotos.
+User-agent: *
+Disallow: /acceso
+Disallow: /gestion
+Disallow: /solicitud
+Disallow: /formulario
+
+Sitemap: https://villapirritx.org/sitemap.xml
