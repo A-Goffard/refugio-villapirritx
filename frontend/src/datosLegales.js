@@ -1,11 +1,11 @@
 // Datos de la asociación que aparecen en el aviso legal, la privacidad y las cookies.
-// Lo marcado como PENDIENTE hay que pedírselo a la asociación ANTES de publicar.
 export const ASOCIACION = {
     // Denominación exacta tal y como figura en el Registro de Asociaciones
     nombre: 'Asociación Protectora de Animales Refugio Villa Pirritx',
-    cif: '[PENDIENTE: CIF]',
-    // Tal como figura en el Registro de Asociaciones (es un domicilio particular: sin número ni piso)
-    domicilio: 'Avanzada Errepidea, 48150 Sondika (Bizkaia)',
+    cif: 'G05445549',
+    // Es un domicilio particular: solo código postal y municipio. La dirección completa
+    // consta en el Registro de Asociaciones (nº en 'registro')
+    domicilio: '48150 Sondika (Bizkaia)',
     registro: 'Registro General de Asociaciones del País Vasco, nº AS/B/23654/2021',
     email: 'villapirritxanimaliak@gmail.com',
     web: 'https://villapirritx.org',
@@ -16,4 +16,4 @@ export const ASOCIACION = {
 }
 
 // Cambiar la fecha cada vez que se modifique algún texto legal
-export const ULTIMA_ACTUALIZACION = '18 de noviembre de 2026'
+export const ULTIMA_ACTUALIZACION = '19 de noviembre de 2026'
