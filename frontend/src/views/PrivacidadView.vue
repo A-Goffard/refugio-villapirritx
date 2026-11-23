@@ -81,10 +81,11 @@ import { ASOCIACION } from '@/datosLegales'
     <ul>
         <li><strong>{{ ASOCIACION.alojamiento }}</strong>: servidor donde está alojada esta web y donde se guardan los
             formularios.</li>
-        <li><strong>Google (Gmail y Google Drive)</strong>: la cuenta de correo de la asociación, donde recibimos los
-            avisos de los formularios y tus emails, y el espacio donde guardamos copias de seguridad cifradas de la
-            web. Google puede tratar datos fuera de la Unión Europea; lo hace con las garantías del Marco de
-            Privacidad de Datos UE-EE. UU.</li>
+        <li><strong>{{ ASOCIACION.copias }}</strong>: servidor en España donde guardamos las copias de seguridad
+            cifradas de la web.</li>
+        <li><strong>Google (Gmail)</strong>: la cuenta de correo de la asociación, donde recibimos los avisos de los
+            formularios y tus emails. Google puede tratar datos fuera de la Unión Europea; lo hace con las garantías
+            del Marco de Privacidad de Datos UE-EE. UU.</li>
     </ul>
     <p>Si colaboras a través de <strong>Teaming</strong>, <strong>Coral</strong> o <strong>Yako Happy</strong>, son esas
         plataformas quienes recogen y tratan tus datos, con sus propias políticas de privacidad. Nosotros no recibimos

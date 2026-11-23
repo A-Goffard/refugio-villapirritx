@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Copia de seguridad de Villa Pirritx: base de datos + fotos subidas desde el panel.
-# Guarda la copia en el servidor y sube otra (cifrada) a Google Drive con rclone.
+# Guarda la copia en el servidor y sube otra, cifrada, al VPS de copias (SFTP) con rclone.
 # Se ejecuta cada noche con cron. Instalación y restauración: scripts/COPIAS.md
 set -euo pipefail
 
 # --- Configuración (se puede cambiar con variables de entorno) ---
 CARPETA_LOCAL="${CARPETA_LOCAL:-/root/copias-villapirritx}"  # copias dentro del propio servidor
 DIAS_LOCAL="${DIAS_LOCAL:-7}"                                 # cuántos días se guardan aquí
-DESTINO_DRIVE="${DESTINO_DRIVE:-copias-cifradas:}"            # remoto de rclone configurado en COPIAS.md
-DIAS_DRIVE="${DIAS_DRIVE:-30}"                                # cuántos días se guardan en Drive
+DESTINO="${DESTINO:-copias-vps:}"                             # remoto cifrado de rclone (ver COPIAS.md)
+# Los 30 días en el destino los borra un cron del VPS de copias: desde aquí no se puede borrar allí
 AVISAR_A="${AVISAR_A:-}"                                      # email para avisos de fallo (vacío = el de la web)
 
 # cron arranca con un PATH mínimo
@@ -61,10 +61,10 @@ tar -czf "$ARCHIVO" -C "$TRABAJO" db.sqlite3 media.tar
 chmod 600 "$ARCHIVO"
 echo "Copia local: $ARCHIVO ($(du -h "$ARCHIVO" | cut -f1))"
 
-# 4. Subir a Google Drive (rclone la cifra al subirla) y borrar allí las antiguas
-rclone copy "$ARCHIVO" "$DESTINO_DRIVE"
-rclone delete --min-age "${DIAS_DRIVE}d" "$DESTINO_DRIVE"
-echo "Subida a Google Drive ($DESTINO_DRIVE)"
+# 4. Subir al VPS de copias: rclone la cifra antes de enviarla.
+#    --inplace: el usuario de copias no puede renombrar archivos, solo añadir
+rclone copy --inplace "$ARCHIVO" "$DESTINO"
+echo "Subida al VPS de copias ($DESTINO)"
 
 # 5. Borrar las copias locales antiguas
 find "$CARPETA_LOCAL" -name 'villapirritx-*.tar.gz' -mtime +"$DIAS_LOCAL" -delete

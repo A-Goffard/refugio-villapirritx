@@ -13,7 +13,9 @@ export const ASOCIACION = {
     // OJO: al migrar a Piensa Solutions, cambiar por 'Tesys Internet, S.L.U. (Piensa Solutions)'
     // y actualizar ULTIMA_ACTUALIZACION
     alojamiento: 'IONOS Cloud, S.L.U.',
+    // Empresa del servidor (VPS, en España) donde se guardan las copias de seguridad cifradas
+    copias: 'Tesys Internet, S.L.U. (Piensa Solutions)',
 }
 
 // Cambiar la fecha cada vez que se modifique algún texto legal
-export const ULTIMA_ACTUALIZACION = '19 de noviembre de 2026'
+export const ULTIMA_ACTUALIZACION = '23 de noviembre de 2026'
